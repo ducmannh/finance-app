@@ -9,6 +9,7 @@ const SECRET_KEY = new TextEncoder().encode(
 export interface JWTPayload {
   userId: string;
   email: string;
+  username?: string;
   name: string;
 }
 

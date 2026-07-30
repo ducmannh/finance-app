@@ -1,10 +1,9 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z
+  username: z
     .string()
-    .min(1, "Vui lòng nhập Email")
-    .email("Định dạng Email không hợp lệ"),
+    .min(1, "Vui lòng nhập Tên đăng nhập hoặc Email"),
   password: z
     .string()
     .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
@@ -17,6 +16,11 @@ export const registerSchema = z
     name: z
       .string()
       .min(2, "Họ và tên phải có ít nhất 2 ký tự"),
+    username: z
+      .string()
+      .min(3, "Tên đăng nhập phải có ít nhất 3 ký tự")
+      .max(20, "Tên đăng nhập tối đa 20 ký tự")
+      .regex(/^[a-zA-Z0-9_]+$/, "Tên đăng nhập chỉ chứa chữ cái, số và dấu gạch dưới (_)"),
     email: z
       .string()
       .min(1, "Vui lòng nhập Email")

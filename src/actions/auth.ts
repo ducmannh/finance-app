@@ -24,18 +24,29 @@ export async function registerAction(data: RegisterInput): Promise<ActionResult>
     };
   }
 
-  const { name, email, password } = validation.data;
+  const { name, username, email, password } = validation.data;
 
   try {
-    // 2. Kiểm tra email tồn tại
-    const existingUser = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+    // 2. Kiểm tra email hoặc username tồn tại
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: email.toLowerCase() },
+          { username: username.toLowerCase() },
+        ],
+      },
     });
 
     if (existingUser) {
+      if (existingUser.email.toLowerCase() === email.toLowerCase()) {
+        return {
+          success: false,
+          error: "Email này đã được sử dụng. Vui lòng chọn Email khác.",
+        };
+      }
       return {
         success: false,
-        error: "Email này đã được sử dụng. Vui lòng chọn Email khác.",
+        error: "Tên đăng nhập này đã tồn tại. Vui lòng chọn Tên đăng nhập khác.",
       };
     }
 
@@ -46,6 +57,7 @@ export async function registerAction(data: RegisterInput): Promise<ActionResult>
     const newUser = await prisma.user.create({
       data: {
         name,
+        username: username.toLowerCase(),
         email: email.toLowerCase(),
         password: hashedPassword,
       },
@@ -55,6 +67,7 @@ export async function registerAction(data: RegisterInput): Promise<ActionResult>
     const token = await createSessionToken({
       userId: newUser.id,
       email: newUser.email,
+      username: newUser.username || undefined,
       name: newUser.name,
     });
 
@@ -83,18 +96,24 @@ export async function loginAction(data: LoginInput): Promise<ActionResult> {
     };
   }
 
-  const { email, password } = validation.data;
+  const { username, password } = validation.data;
 
   try {
-    // 2. Tìm User trong Database
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+    // 2. Tìm User trong Database (hỗ trợ cả Tên đăng nhập hoặc Email)
+    const identifier = username.toLowerCase();
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: identifier },
+          { username: identifier },
+        ],
+      },
     });
 
     if (!user) {
       return {
         success: false,
-        error: "Email hoặc mật khẩu không chính xác.",
+        error: "Tên đăng nhập / Email hoặc mật khẩu không chính xác.",
       };
     }
 
@@ -103,7 +122,7 @@ export async function loginAction(data: LoginInput): Promise<ActionResult> {
     if (!isPasswordValid) {
       return {
         success: false,
-        error: "Email hoặc mật khẩu không chính xác.",
+        error: "Tên đăng nhập / Email hoặc mật khẩu không chính xác.",
       };
     }
 
@@ -111,6 +130,7 @@ export async function loginAction(data: LoginInput): Promise<ActionResult> {
     const token = await createSessionToken({
       userId: user.id,
       email: user.email,
+      username: user.username || undefined,
       name: user.name,
     });
 

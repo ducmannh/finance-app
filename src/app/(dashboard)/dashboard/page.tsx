@@ -1,10 +1,9 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { logoutAction } from "@/actions/auth";
-import { Button } from "@/components/ui/button";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, UserCheck, ShieldCheck, Mail, User as UserIcon } from "lucide-react";
+import { UserCheck, ShieldCheck, Mail, User as UserIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Dashboard | My Finance App",
@@ -31,11 +30,7 @@ export default async function DashboardPage() {
               Bạn đã đăng nhập thành công vào hệ thống.
             </p>
           </div>
-          <form action={logoutAction}>
-            <Button variant="destructive" className="flex items-center gap-2">
-              <LogOut className="h-4 w-4" /> Đăng xuất
-            </Button>
-          </form>
+          <LogoutButton />
         </div>
 
         {/* Profile Card */}
