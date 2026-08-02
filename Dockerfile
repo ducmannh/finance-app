@@ -1,6 +1,5 @@
 # Step 1: Dependencies
 FROM node:20-alpine AS deps
-RUN npm install -g npm@latest
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
