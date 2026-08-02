@@ -17,6 +17,8 @@ interface TransactionManagerProps {
   initialTotalExpense: number;
 }
 
+import { getCategoriesAction } from "@/actions/category";
+
 export function TransactionManager({
   initialTransactions,
   initialCategories,
@@ -34,6 +36,13 @@ export function TransactionManager({
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
+
+  const fetchCategories = async () => {
+    const res = await getCategoriesAction();
+    if (res.success && res.categories) {
+      setCategories(res.categories);
+    }
+  };
 
   const fetchTransactions = async () => {
     const res = await getTransactionsAction({
@@ -196,6 +205,7 @@ export function TransactionManager({
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onSuccess={fetchTransactions}
+        onRefreshCategories={fetchCategories}
       />
     </div>
   );

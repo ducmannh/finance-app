@@ -342,8 +342,10 @@ export function TransactionDialog({
         defaultType={selectedType}
         isOpen={isCategoryDialogOpen}
         onClose={() => setIsCategoryDialogOpen(false)}
-        onSuccess={() => {
-          if (onRefreshCategories) onRefreshCategories();
+        onSuccess={async () => {
+          if (onRefreshCategories) {
+            await onRefreshCategories();
+          }
         }}
       />
     </>
