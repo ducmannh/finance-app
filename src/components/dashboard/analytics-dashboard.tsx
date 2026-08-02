@@ -31,19 +31,37 @@ const PERIOD_OPTIONS: { value: PeriodFilter; label: string }[] = [
   { value: "ALL", label: "Tất cả" },
 ];
 
+// Helper định dạng Date -> YYYY-MM-DD theo giờ địa phương (tránh dùng toISOString bị lệch múi giờ nhảy ngày)
+const formatDateToYYYYMMDD = (d: Date) => {
+  const year = d.getFullYear();
+  const month = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+// Helper chuyển YYYY-MM-DD -> Date theo giờ địa phương
+const parseYYYYMMDDToDate = (str: string) => {
+  if (!str) return new Date();
+  const parts = str.split("-").map(Number);
+  if (parts.length === 3 && !parts.some(isNaN)) {
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+  return new Date();
+};
+
 export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
   const [period, setPeriod] = useState<PeriodFilter>("THIS_MONTH");
 
   // State cho chọn Tháng cụ thể (Định dạng YYYY-MM)
   const todayObj = new Date();
-  const todayStr = todayObj.toISOString().split("T")[0];
+  const todayStr = formatDateToYYYYMMDD(todayObj);
   const currentMonthStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}`;
 
   const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthStr);
 
   // State cho khoảng thời gian bất kỳ (StartDate & EndDate)
   const [startDateStr, setStartDateStr] = useState<string>(
-    new Date(todayObj.getFullYear(), todayObj.getMonth(), 1).toISOString().split("T")[0]
+    formatDateToYYYYMMDD(new Date(todayObj.getFullYear(), todayObj.getMonth(), 1))
   );
   const [endDateStr, setEndDateStr] = useState<string>(todayStr);
 
@@ -125,10 +143,11 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
                 key={opt.value}
                 type="button"
                 onClick={() => setPeriod(opt.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${period === opt.value
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  period === opt.value
                     ? "bg-primary text-primary-foreground font-bold shadow-xs"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                  }`}
+                }`}
               >
                 {opt.label}
               </button>
@@ -153,8 +172,8 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
                 <span className="text-muted-foreground">Từ:</span>
                 <div className="w-44">
                   <DatePicker
-                    value={new Date(startDateStr)}
-                    onChange={(d) => setStartDateStr(d.toISOString().split("T")[0])}
+                    value={parseYYYYMMDDToDate(startDateStr)}
+                    onChange={(d) => setStartDateStr(formatDateToYYYYMMDD(d))}
                   />
                 </div>
               </div>
@@ -163,8 +182,8 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
                 <span className="text-muted-foreground">Đến:</span>
                 <div className="w-44">
                   <DatePicker
-                    value={new Date(endDateStr)}
-                    onChange={(d) => setEndDateStr(d.toISOString().split("T")[0])}
+                    value={parseYYYYMMDDToDate(endDateStr)}
+                    onChange={(d) => setEndDateStr(formatDateToYYYYMMDD(d))}
                   />
                 </div>
               </div>
