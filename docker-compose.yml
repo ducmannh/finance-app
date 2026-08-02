@@ -1,0 +1,32 @@
+services:
+  # Database PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: finance_db
+    restart: always
+    environment:
+      POSTGRES_USER: finance_user
+      POSTGRES_PASSWORD: finance_password_123
+      POSTGRES_DB: my_finance_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Next.js Web App
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finance_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://finance_user:finance_password_123@postgres:5432/my_finance_db?schema=public"
+      JWT_SECRET: "your_jwt_secret_key_change_me_in_production"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
