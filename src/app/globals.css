@@ -157,8 +157,15 @@
 }
 
 .bg-dot-grid {
-  background-image: radial-gradient(rgba(120, 119, 198, 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(120, 119, 198, 0.35) 1.5px, transparent 1.5px);
   background-size: 24px 24px;
+}
+
+.bg-line-grid {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(120, 119, 198, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(120, 119, 198, 0.12) 1px, transparent 1px);
 }
 
 /* Custom autofill styles for dark theme inputs */
