@@ -1,6 +1,6 @@
 # Step 1: Dependencies
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat tzdata
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -24,6 +24,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV TZ="Asia/Ho_Chi_Minh"
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
