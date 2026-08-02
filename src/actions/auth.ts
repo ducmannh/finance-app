@@ -73,8 +73,11 @@ export async function registerAction(data: RegisterInput): Promise<ActionResult>
 
     await setSessionCookie(token);
 
-    return { success: true };
+    redirect("/dashboard");
   } catch (error) {
+    if ((error as Error).message === "NEXT_REDIRECT") {
+      throw error;
+    }
     console.error("Register Error:", error);
     return {
       success: false,
@@ -136,8 +139,11 @@ export async function loginAction(data: LoginInput): Promise<ActionResult> {
 
     await setSessionCookie(token);
 
-    return { success: true };
+    redirect("/dashboard");
   } catch (error) {
+    if ((error as Error).message === "NEXT_REDIRECT") {
+      throw error;
+    }
     console.error("Login Error:", error);
     return {
       success: false,
