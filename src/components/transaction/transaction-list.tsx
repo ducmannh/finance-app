@@ -75,12 +75,22 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
     );
   }
 
-  // Nhóm giao dịch theo Ngày (YYYY-MM-DD)
+  // Helper lấy key ngày YYYY-MM-DD theo giờ địa phương (tránh lệch múi giờ UTC do toISOString)
+  const getLocalDateKey = (dateInput: Date | string) => {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = `${d.getMonth() + 1}`.padStart(2, "0");
+    const day = `${d.getDate()}`.padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Nhóm giao dịch theo Ngày địa phương (YYYY-MM-DD)
   const groupedTransactions: Record<string, TransactionData[]> = {};
 
   transactions.forEach((t) => {
-    const d = new Date(t.date);
-    const dateKey = d.toISOString().split("T")[0];
+    const dateKey = getLocalDateKey(t.date);
+    if (!dateKey) return;
     if (!groupedTransactions[dateKey]) {
       groupedTransactions[dateKey] = [];
     }
@@ -88,14 +98,20 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
   });
 
   const formatDateHeader = (dateStr: string) => {
-    const dateObj = new Date(dateStr);
-    const todayStr = new Date().toISOString().split("T")[0];
+    if (!dateStr) return "";
+
+    const todayStr = getLocalDateKey(new Date());
+
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
+    const yesterdayStr = getLocalDateKey(yesterday);
 
     if (dateStr === todayStr) return "Hôm nay";
     if (dateStr === yesterdayStr) return "Hôm qua";
+
+    // dateStr có dạng "YYYY-MM-DD" -> parse theo giờ địa phương
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const dateObj = new Date(year, month - 1, day);
 
     return dateObj.toLocaleDateString("vi-VN", {
       weekday: "long",

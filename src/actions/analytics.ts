@@ -212,9 +212,16 @@ export async function getAnalyticsSummaryAction(
         timeSeriesMap[dayKey] = { income: 0, expense: 0, label };
       }
 
+      const getLocalDateKey = (d: Date) => {
+        const year = d.getFullYear();
+        const month = `${d.getMonth() + 1}`.padStart(2, "0");
+        const day = `${d.getDate()}`.padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
       transactions.forEach((t) => {
         const d = new Date(t.date);
-        const dayKey = d.toISOString().split("T")[0];
+        const dayKey = getLocalDateKey(d);
         if (timeSeriesMap[dayKey]) {
           if (t.type === "INCOME") timeSeriesMap[dayKey].income += t.amount;
           else timeSeriesMap[dayKey].expense += t.amount;
@@ -222,9 +229,16 @@ export async function getAnalyticsSummaryAction(
       });
     } else {
       // Nhóm theo ngày
+      const getLocalDateKey = (d: Date) => {
+        const year = d.getFullYear();
+        const month = `${d.getMonth() + 1}`.padStart(2, "0");
+        const day = `${d.getDate()}`.padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
       transactions.forEach((t) => {
         const d = new Date(t.date);
-        const dateKey = d.toISOString().split("T")[0];
+        const dateKey = getLocalDateKey(d);
         const label = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
 
         if (!timeSeriesMap[dateKey]) {
