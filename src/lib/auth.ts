@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const COOKIE_NAME = "auth_session";
 const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || "default_super_secret_jwt_key_2026_finance_app"
+  process.env.JWT_SECRET
 );
 
 export interface JWTPayload {
