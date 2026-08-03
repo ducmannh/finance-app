@@ -68,7 +68,6 @@ export function EditWalletDialog({
   } = useForm<UpdateWalletInput>({
     resolver: zodResolver(updateWalletSchema),
     defaultValues: {
-      id: wallet.id,
       name: wallet.name,
       balance: wallet.balance,
       color: wallet.color,
@@ -82,7 +81,6 @@ export function EditWalletDialog({
 
   useEffect(() => {
     if (wallet) {
-      setValue("id", wallet.id);
       setValue("name", wallet.name);
       setValue("balance", wallet.balance);
       setValue("color", wallet.color);
