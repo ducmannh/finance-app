@@ -31,7 +31,7 @@ export default async function DashboardLayout({
       </div>
 
       <Navbar userName={session.name} />
-      <main className="relative z-10 flex-1 p-4 md:p-8 max-w-6xl w-full mx-auto">
+      <main className="relative z-10 flex-1 p-4 pb-20 md:p-8 md:pb-8 max-w-6xl w-full mx-auto">
         {children}
       </main>
     </div>

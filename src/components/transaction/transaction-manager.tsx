@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { TransactionData, getTransactionsAction } from "@/actions/transaction";
-import { CategoryData } from "@/actions/category";
+import { CategoryData, getCategoriesAction } from "@/actions/category";
 import { TransactionFilter } from "@/components/transaction/transaction-filter";
 import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionDialog } from "@/components/transaction/transaction-dialog";
@@ -16,8 +16,6 @@ interface TransactionManagerProps {
   initialTotalIncome: number;
   initialTotalExpense: number;
 }
-
-import { getCategoriesAction } from "@/actions/category";
 
 export function TransactionManager({
   initialTransactions,
@@ -33,6 +31,8 @@ export function TransactionManager({
   const [typeFilter, setTypeFilter] = useState<"ALL" | "INCOME" | "EXPENSE">("ALL");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [startDate, setStartDate] = useState<string | undefined>(undefined);
+  const [endDate, setEndDate] = useState<string | undefined>(undefined);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
@@ -49,6 +49,8 @@ export function TransactionManager({
       type: typeFilter,
       categoryId: categoryFilter,
       searchQuery,
+      startDate,
+      endDate,
     });
     if (res.success && res.transactions) {
       setTransactions(res.transactions);
@@ -63,6 +65,8 @@ export function TransactionManager({
       type,
       categoryId: categoryFilter,
       searchQuery,
+      startDate,
+      endDate,
     });
     if (res.success && res.transactions) {
       setTransactions(res.transactions);
@@ -77,6 +81,8 @@ export function TransactionManager({
       type: typeFilter,
       categoryId: catId,
       searchQuery,
+      startDate,
+      endDate,
     });
     if (res.success && res.transactions) {
       setTransactions(res.transactions);
@@ -91,6 +97,25 @@ export function TransactionManager({
       type: typeFilter,
       categoryId: categoryFilter,
       searchQuery: query,
+      startDate,
+      endDate,
+    });
+    if (res.success && res.transactions) {
+      setTransactions(res.transactions);
+      setTotalIncome(res.totalIncome || 0);
+      setTotalExpense(res.totalExpense || 0);
+    }
+  };
+
+  const handleDateRangeChange = async (sDate?: string, eDate?: string) => {
+    setStartDate(sDate);
+    setEndDate(eDate);
+    const res = await getTransactionsAction({
+      type: typeFilter,
+      categoryId: categoryFilter,
+      searchQuery,
+      startDate: sDate,
+      endDate: eDate,
     });
     if (res.success && res.transactions) {
       setTransactions(res.transactions);
@@ -111,37 +136,41 @@ export function TransactionManager({
 
   return (
     <div className="space-y-6">
-      {/* Top Metric Cards: Thu nhập / Chi tiêu / Dòng tiền ròng */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Thu nhập */}
-        <Card className="border-border/60 bg-emerald-500/5 dark:bg-emerald-950/20">
+      {/* Overview Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Tổng Thu */}
+        <Card className="border-border/60 bg-emerald-500/5">
           <CardContent className="p-5 flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                Tổng Thu nhập
+                Tổng thu nhập
               </p>
               <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-1">
-                +{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalIncome)}
+                +{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                  totalIncome
+                )}
               </p>
             </div>
-            <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-500">
+            <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
               <TrendingUp className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Chi tiêu */}
-        <Card className="border-border/60 bg-rose-500/5 dark:bg-rose-950/20">
+        {/* Tổng Chi */}
+        <Card className="border-border/60 bg-rose-500/5">
           <CardContent className="p-5 flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
-                Tổng Chi tiêu
+                Tổng chi tiêu
               </p>
               <p className="text-2xl font-extrabold text-rose-600 dark:text-rose-400 font-mono mt-1">
-                -{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalExpense)}
+                -{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                  totalExpense
+                )}
               </p>
             </div>
-            <div className="p-3 rounded-full bg-rose-500/10 text-rose-500">
+            <div className="p-3 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
               <TrendingDown className="h-6 w-6" />
             </div>
           </CardContent>
@@ -185,6 +214,9 @@ export function TransactionManager({
             onCategoryChange={handleCategoryChange}
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
+            startDate={startDate}
+            endDate={endDate}
+            onDateRangeChange={handleDateRangeChange}
           />
         </div>
         <Button onClick={handleCreate} size="lg" className="gap-2 font-bold shrink-0">

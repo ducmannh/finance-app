@@ -59,7 +59,7 @@ export function WalletCard({ wallet, onRefresh }: WalletCardProps) {
 
         <CardContent className="p-6 md:p-8 space-y-6">
           {/* Header Row */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div
                 className="p-3.5 rounded-2xl text-white shadow-md transition-transform hover:scale-105"

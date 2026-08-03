@@ -88,12 +88,24 @@ export async function getTransactionsAction(filters?: TransactionFilters): Promi
     if (filters?.startDate || filters?.endDate) {
       whereCondition.date = {};
       if (filters.startDate) {
-        whereCondition.date.gte = new Date(filters.startDate);
+        const parts = filters.startDate.split("-").map(Number);
+        if (parts.length === 3) {
+          // Bắt đầu ngày ở GMT+7 (00:00:00.000 GMT+7 = 17:00:00 UTC ngày hôm trước)
+          whereCondition.date.gte = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], -7, 0, 0, 0));
+        } else {
+          whereCondition.date.gte = new Date(filters.startDate);
+        }
       }
       if (filters.endDate) {
-        const endDateObj = new Date(filters.endDate);
-        endDateObj.setHours(23, 59, 59, 999);
-        whereCondition.date.lte = endDateObj;
+        const parts = filters.endDate.split("-").map(Number);
+        if (parts.length === 3) {
+          // Kết thúc ngày ở GMT+7 (23:59:59.999 GMT+7 = 16:59:59.999 UTC)
+          whereCondition.date.lte = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 16, 59, 59, 999));
+        } else {
+          const endDateObj = new Date(filters.endDate);
+          endDateObj.setHours(23, 59, 59, 999);
+          whereCondition.date.lte = endDateObj;
+        }
       }
     }
 

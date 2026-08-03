@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Loader2, X } from "lucide-react";
 
@@ -26,10 +27,19 @@ export function ConfirmDialog({
   onClose,
   onConfirm,
 }: ConfirmDialogProps) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 pb-20 sm:p-4 animate-in fade-in-0">
       <div className="bg-card text-card-foreground border border-border/60 shadow-2xl rounded-2xl max-w-md w-full overflow-hidden p-6 space-y-5 animate-in zoom-in-95">
         {/* Header with Alert Icon */}
         <div className="flex items-start justify-between gap-4">

@@ -31,7 +31,7 @@ const PERIOD_OPTIONS: { value: PeriodFilter; label: string }[] = [
   { value: "ALL", label: "Tất cả" },
 ];
 
-// Helper định dạng Date -> YYYY-MM-DD theo giờ địa phương (tránh dùng toISOString bị lệch múi giờ nhảy ngày)
+// Helper định dạng Date -> YYYY-MM-DD theo giờ địa phương
 const formatDateToYYYYMMDD = (d: Date) => {
   const year = d.getFullYear();
   const month = `${d.getMonth() + 1}`.padStart(2, "0");
@@ -106,20 +106,20 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
       <div className="flex flex-col gap-4 border-b border-border/40 pb-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
-              <LayoutDashboard className="h-8 w-8 text-primary" /> Tổng Quan Tài Chính
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+              <LayoutDashboard className="h-7 w-7 sm:h-8 sm:w-8 text-primary" /> Tổng Quan Tài Chính
             </h1>
-            <p className="text-muted-foreground mt-1">
-              Chào mừng trở lại, <span className="font-semibold text-foreground">{userName}</span>! Dưới đây là báo cáo thống kê thu chi của bạn.
+            <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
+              Chào mừng trở lại, <span className="font-semibold text-foreground">{userName}</span>!
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={loadData}
               disabled={loading}
-              className={cn(buttonVariants({ variant: "outline", size: "icon" }), "rounded-xl shrink-0")}
+              className={cn(buttonVariants({ variant: "outline", size: "icon" }), "rounded-xl shrink-0 cursor-pointer")}
               title="Làm mới dữ liệu"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -127,23 +127,23 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
 
             <Link
               href="/transactions"
-              className={cn(buttonVariants({ variant: "default" }), "rounded-xl flex items-center gap-2 text-xs font-bold shrink-0")}
+              className={cn(buttonVariants({ variant: "default" }), "rounded-xl flex items-center gap-2 text-xs font-bold shrink-0 cursor-pointer")}
             >
               <Plus className="h-4 w-4" /> Thêm giao dịch
             </Link>
           </div>
         </div>
 
-        {/* Thanh Bộ Lọc Thời Gian Nâng Cao */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        {/* Thanh Bộ Lọc Thời Gian Nâng Cao (Responsive cho di động) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           {/* Preset Buttons */}
-          <div className="flex items-center p-1 rounded-xl bg-card border border-border/60 shadow-2xs overflow-x-auto">
+          <div className="flex items-center p-1 rounded-xl bg-card border border-border/60 shadow-2xs overflow-x-auto scrollbar-none w-full sm:w-auto">
             {PERIOD_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setPeriod(opt.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex-1 sm:flex-none text-center ${
                   period === opt.value
                     ? "bg-primary text-primary-foreground font-bold shadow-xs"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
@@ -156,7 +156,8 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
 
           {/* Custom Month Picker */}
           {period === "SPECIFIC_MONTH" && (
-            <div className="flex items-center gap-2 animate-in fade-in-0 slide-in-from-right-2">
+            <div className="flex items-center gap-2 animate-in fade-in-0 slide-in-from-top-1 w-full sm:w-auto justify-start sm:justify-end">
+              <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Chọn tháng:</span>
               <MonthPicker
                 value={selectedMonth}
                 onChange={(newMonth) => setSelectedMonth(newMonth)}
@@ -166,11 +167,11 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
 
           {/* Custom Date Range Picker */}
           {period === "CUSTOM_RANGE" && (
-            <div className="flex items-center gap-3 bg-card p-1.5 rounded-2xl border border-border/60 shadow-2xs flex-wrap animate-in fade-in-0 slide-in-from-right-2">
-              <div className="flex items-center gap-2 text-xs font-semibold pl-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 bg-card p-2.5 rounded-2xl border border-border/60 shadow-2xs animate-in fade-in-0 slide-in-from-top-1 w-full sm:w-auto">
+              <div className="flex items-center gap-2 text-xs font-semibold">
                 <Filter className="h-4 w-4 text-primary shrink-0" />
-                <span className="text-muted-foreground">Từ:</span>
-                <div className="w-44">
+                <span className="text-muted-foreground whitespace-nowrap">Từ:</span>
+                <div className="flex-1 sm:w-40">
                   <DatePicker
                     value={parseYYYYMMDDToDate(startDateStr)}
                     onChange={(d) => setStartDateStr(formatDateToYYYYMMDD(d))}
@@ -178,9 +179,9 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs font-semibold pl-1">
-                <span className="text-muted-foreground">Đến:</span>
-                <div className="w-44">
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <span className="text-muted-foreground whitespace-nowrap">Đến:</span>
+                <div className="flex-1 sm:w-40">
                   <DatePicker
                     value={parseYYYYMMDDToDate(endDateStr)}
                     onChange={(d) => setEndDateStr(formatDateToYYYYMMDD(d))}

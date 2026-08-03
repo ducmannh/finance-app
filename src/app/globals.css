@@ -179,3 +179,16 @@ input:-webkit-autofill:active {
   transition: background-color 50000s ease-in-out 0s;
   caret-color: #f8fafc;
 }
+
+/* Ngăn trình duyệt di động (iOS Safari & Android Chrome) tự động auto-zoom khi chạm chọn/lưu ô nhập liệu */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

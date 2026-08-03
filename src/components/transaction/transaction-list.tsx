@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TransactionData, deleteTransactionAction } from "@/actions/transaction";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
@@ -55,9 +55,17 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Shirt,
 };
 
+const DAY_OF_WEEK_FULL = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+const DAY_OF_WEEK_SHORT = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+
 export function TransactionList({ transactions, onEdit, onRefresh }: TransactionListProps) {
   const [transactionToDelete, setTransactionToDelete] = useState<TransactionData | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   if (transactions.length === 0) {
     return (
@@ -75,7 +83,7 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
     );
   }
 
-  // Helper lấy key ngày YYYY-MM-DD theo giờ địa phương (tránh lệch múi giờ UTC do toISOString)
+  // Helper lấy key ngày YYYY-MM-DD theo giờ địa phương
   const getLocalDateKey = (dateInput: Date | string) => {
     const d = new Date(dateInput);
     if (isNaN(d.getTime())) return "";
@@ -100,44 +108,42 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
   const formatDateHeader = (dateStr: string) => {
     if (!dateStr) return "";
 
-    const todayStr = getLocalDateKey(new Date());
+    if (isMounted) {
+      const todayStr = getLocalDateKey(new Date());
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = getLocalDateKey(yesterday);
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = getLocalDateKey(yesterday);
 
-    if (dateStr === todayStr) return "Hôm nay";
-    if (dateStr === yesterdayStr) return "Hôm qua";
+      if (dateStr === todayStr) return "Hôm nay";
+      if (dateStr === yesterdayStr) return "Hôm qua";
+    }
 
-    // dateStr có dạng "YYYY-MM-DD" -> parse theo giờ địa phương
     const [year, month, day] = dateStr.split("-").map(Number);
-    const dateObj = new Date(year, month - 1, day);
+    if (!year || !month || !day) return dateStr;
 
-    return dateObj.toLocaleDateString("vi-VN", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+    const dateObj = new Date(year, month - 1, day);
+    const dayOfWeek = DAY_OF_WEEK_FULL[dateObj.getDay()] || "";
+
+    const formattedDay = String(day).padStart(2, "0");
+    const formattedMonth = String(month).padStart(2, "0");
+
+    return `${dayOfWeek}, ${formattedDay}/${formattedMonth}/${year}`;
   };
 
   const formatFullDateTime = (dateInput: Date | string) => {
     const d = new Date(dateInput);
     if (isNaN(d.getTime())) return "";
 
-    const dateStr = d.toLocaleDateString("vi-VN", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-    const timeStr = d.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+    const weekday = DAY_OF_WEEK_SHORT[d.getDay()] || "";
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
 
-    return `${dateStr} • ${timeStr}`;
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+
+    return `${weekday}, ${day}/${month}/${year} • ${hours}:${minutes}`;
   };
 
   const handleConfirmDelete = async () => {
@@ -163,7 +169,6 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
   return (
     <div className="space-y-6">
       {Object.entries(groupedTransactions).map(([dateKey, items]) => {
-        // Tính tổng trong ngày
         let dayIncome = 0;
         let dayExpense = 0;
         items.forEach((item) => {
@@ -172,11 +177,13 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
         });
 
         return (
-          <div key={dateKey} className="space-y-3">
-            {/* Header ngày */}
-            <div className="flex items-center justify-between px-2 text-xs font-bold uppercase tracking-wider">
-              <span className="text-foreground/90 dark:text-slate-200">{formatDateHeader(dateKey)}</span>
-              <div className="flex items-center gap-3 text-sm font-bold font-mono tracking-normal normal-case">
+          <div key={dateKey} className="space-y-2.5">
+            {/* Header ngày (Thêm suppressHydrationWarning chống đụng độ thời gian máy chủ/khách) */}
+            <div className="flex items-center justify-between px-1 text-xs font-bold uppercase tracking-wider">
+              <span suppressHydrationWarning className="text-foreground/90 dark:text-slate-200">
+                {formatDateHeader(dateKey)}
+              </span>
+              <div className="flex items-center gap-2.5 text-xs font-bold font-mono tracking-normal normal-case">
                 {dayIncome > 0 && (
                   <span className="text-emerald-600 dark:text-emerald-400">
                     +{new Intl.NumberFormat("vi-VN").format(dayIncome)} ₫
@@ -191,7 +198,7 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
             </div>
 
             {/* List giao dịch trong ngày */}
-            <div className="divide-y divide-border/40 rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
+            <div className="divide-y divide-border/40 rounded-2xl bg-card border border-border/60 shadow-xs overflow-hidden">
               {items.map((t) => {
                 const IconComp = ICON_MAP[t.category.icon] || Tag;
                 const isIncome = t.type === "INCOME";
@@ -199,26 +206,26 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
                 return (
                   <div
                     key={t.id}
-                    className="flex items-center justify-between p-4 hover:bg-muted/40 transition-colors group"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 gap-2 sm:gap-4 hover:bg-muted/40 transition-colors group"
                   >
                     {/* Tra trái: Icon + Tên danh mục + Ghi chú */}
-                    <div className="flex items-center gap-3.5">
+                    <div className="flex items-center gap-3 min-w-0">
                       <div
-                        className="p-2.5 rounded-xl text-white shadow-sm shrink-0"
+                        className="p-2.5 rounded-xl text-white shadow-xs shrink-0"
                         style={{ backgroundColor: t.category.color }}
                       >
-                        <IconComp className="h-5 w-5" />
+                        <IconComp className="h-4.5 w-4.5" />
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">{t.category.name}</p>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs">
-                          <span className="inline-flex items-center gap-1 font-medium text-foreground/80 dark:text-slate-300">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold text-foreground truncate">{t.category.name}</p>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-xs">
+                          <span suppressHydrationWarning className="inline-flex items-center gap-1 font-medium text-foreground/80 dark:text-slate-300 whitespace-nowrap">
                             <Clock className="h-3.5 w-3.5 shrink-0 text-primary" />
                             {formatFullDateTime(t.date)}
                           </span>
                           {t.note && (
                             <>
-                              <span className="text-muted-foreground/40">•</span>
+                              <span className="text-muted-foreground/40 hidden sm:inline">•</span>
                               <span className="line-clamp-1 font-medium text-foreground/90 dark:text-slate-200">
                                 {t.note}
                               </span>
@@ -229,7 +236,7 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
                     </div>
 
                     {/* Vế phải: Số tiền + Nút hành động */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-border/30">
                       <span
                         className={`text-base font-extrabold font-mono ${
                           isIncome ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
@@ -239,8 +246,8 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
                         {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(t.amount)}
                       </span>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Action Buttons: Hiển thị trên mobile touch & desktop hover */}
+                      <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
                           size="icon-xs"

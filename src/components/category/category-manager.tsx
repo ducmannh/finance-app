@@ -107,34 +107,34 @@ export function CategoryManager({ initialCategories, onRefresh }: CategoryManage
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
         {/* Tabs: Chi tiêu / Thu nhập */}
-        <div className="flex items-center gap-1 p-1 bg-muted/60 rounded-xl w-fit">
+        <div className="flex items-center gap-1 p-1 bg-muted/60 rounded-xl w-full sm:w-fit overflow-x-auto scrollbar-none">
           <button
             type="button"
             onClick={() => setActiveTab("EXPENSE")}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === "EXPENSE"
-                ? "bg-rose-500 text-white shadow-sm"
+                ? "bg-rose-500 text-white shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            🔴 Danh mục Chi tiêu ({initialCategories.filter((c) => c.type === "EXPENSE").length})
+            🔴 Chi tiêu ({initialCategories.filter((c) => c.type === "EXPENSE").length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("INCOME")}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeTab === "INCOME"
-                ? "bg-emerald-500 text-white shadow-sm"
+                ? "bg-emerald-500 text-white shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            🟢 Danh mục Thu nhập ({initialCategories.filter((c) => c.type === "INCOME").length})
+            🟢 Thu nhập ({initialCategories.filter((c) => c.type === "INCOME").length})
           </button>
         </div>
 
-        <Button onClick={handleCreate} className="gap-2 font-semibold">
+        <Button onClick={handleCreate} className="gap-2 font-bold shrink-0 w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Thêm danh mục mới
         </Button>
       </div>
@@ -168,7 +168,7 @@ export function CategoryManager({ initialCategories, onRefresh }: CategoryManage
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                       variant="ghost"
                       size="icon-xs"
