@@ -23,25 +23,26 @@ export interface CategoryData {
   type: "INCOME" | "EXPENSE";
   icon: string;
   color: string;
+  order: number;
   isDefault: boolean;
   createdAt: Date;
 }
 
 const DEFAULT_CATEGORIES = [
   // CHI TIÊU (EXPENSE)
-  { name: "Ăn uống", type: "EXPENSE" as const, icon: "Utensils", color: "#EF4444", isDefault: true },
-  { name: "Đi lại", type: "EXPENSE" as const, icon: "Car", color: "#F59E0B", isDefault: true },
-  { name: "Mua sắm", type: "EXPENSE" as const, icon: "ShoppingBag", color: "#EC4899", isDefault: true },
-  { name: "Giải trí", type: "EXPENSE" as const, icon: "Gamepad2", color: "#8B5CF6", isDefault: true },
-  { name: "Nhà cửa & Hóa đơn", type: "EXPENSE" as const, icon: "Home", color: "#3B82F6", isDefault: true },
-  { name: "Sức khỏe", type: "EXPENSE" as const, icon: "HeartPulse", color: "#10B981", isDefault: true },
-  { name: "Khác", type: "EXPENSE" as const, icon: "Tag", color: "#6B7280", isDefault: true },
+  { name: "Ăn uống", type: "EXPENSE" as const, icon: "Utensils", color: "#EF4444", order: 1, isDefault: true },
+  { name: "Đi lại", type: "EXPENSE" as const, icon: "Car", color: "#F59E0B", order: 2, isDefault: true },
+  { name: "Mua sắm", type: "EXPENSE" as const, icon: "ShoppingBag", color: "#EC4899", order: 3, isDefault: true },
+  { name: "Giải trí", type: "EXPENSE" as const, icon: "Gamepad2", color: "#8B5CF6", order: 4, isDefault: true },
+  { name: "Nhà cửa & Hóa đơn", type: "EXPENSE" as const, icon: "Home", color: "#3B82F6", order: 5, isDefault: true },
+  { name: "Sức khỏe", type: "EXPENSE" as const, icon: "HeartPulse", color: "#10B981", order: 6, isDefault: true },
+  { name: "Khác", type: "EXPENSE" as const, icon: "Tag", color: "#6B7280", order: 7, isDefault: true },
 
   // THU NHẬP (INCOME)
-  { name: "Lương", type: "INCOME" as const, icon: "Briefcase", color: "#10B981", isDefault: true },
-  { name: "Thưởng", type: "INCOME" as const, icon: "Gift", color: "#F59E0B", isDefault: true },
-  { name: "Đầu tư", type: "INCOME" as const, icon: "TrendingUp", color: "#3B82F6", isDefault: true },
-  { name: "Thu nhập khác", type: "INCOME" as const, icon: "Coins", color: "#8B5CF6", isDefault: true },
+  { name: "Lương", type: "INCOME" as const, icon: "Briefcase", color: "#10B981", order: 1, isDefault: true },
+  { name: "Thưởng", type: "INCOME" as const, icon: "Gift", color: "#F59E0B", order: 2, isDefault: true },
+  { name: "Đầu tư", type: "INCOME" as const, icon: "TrendingUp", color: "#3B82F6", order: 3, isDefault: true },
+  { name: "Thu nhập khác", type: "INCOME" as const, icon: "Coins", color: "#8B5CF6", order: 4, isDefault: true },
 ];
 
 /**
@@ -66,12 +67,12 @@ export async function getCategoriesAction(): Promise<{
       };
     }
 
-    // Lấy danh mục hệ thống (userId null) + danh mục riêng của User
+    // Lấy danh mục hệ thống (userId null) + danh mục riêng của User, sắp xếp theo thứ tự order tăng dần
     let categories = await prisma.category.findMany({
       where: {
         OR: [{ userId: null }, { userId: session.userId }],
       },
-      orderBy: [{ isDefault: "desc" }, { name: "asc" }],
+      orderBy: [{ order: "asc" }, { isDefault: "desc" }, { name: "asc" }],
     });
 
     // Nếu CSDL hoàn toàn chưa có danh mục mặc định nào, tiến hành seed tự động
@@ -87,7 +88,7 @@ export async function getCategoriesAction(): Promise<{
         where: {
           OR: [{ userId: null }, { userId: session.userId }],
         },
-        orderBy: [{ isDefault: "desc" }, { name: "asc" }],
+        orderBy: [{ order: "asc" }, { isDefault: "desc" }, { name: "asc" }],
       });
     }
 
@@ -115,7 +116,7 @@ export async function createCategoryAction(data: CreateCategoryInput): Promise<A
     };
   }
 
-  const { name, type, icon, color } = validation.data;
+  const { name, type, icon, color, order } = validation.data;
 
   try {
     if (!prisma.category) {
@@ -132,6 +133,7 @@ export async function createCategoryAction(data: CreateCategoryInput): Promise<A
         type,
         icon,
         color,
+        order: order ?? 0,
         isDefault: false,
       },
     });
@@ -166,7 +168,7 @@ export async function updateCategoryAction(data: UpdateCategoryInput): Promise<A
     };
   }
 
-  const { id, name, type, icon, color } = validation.data;
+  const { id, name, type, icon, color, order } = validation.data;
 
   try {
     if (!prisma.category) {
@@ -181,7 +183,6 @@ export async function updateCategoryAction(data: UpdateCategoryInput): Promise<A
       return { success: false, error: "Không tìm thấy danh mục cần sửa." };
     }
 
-    // Nếu là danh mục mặc định của hệ thống, cho phép cập nhật nếu là do user tác động
     await prisma.category.update({
       where: { id },
       data: {
@@ -189,6 +190,7 @@ export async function updateCategoryAction(data: UpdateCategoryInput): Promise<A
         type,
         icon,
         color,
+        order: order ?? category.order,
       },
     });
 

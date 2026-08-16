@@ -14,6 +14,7 @@ import {
   Gamepad2,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,
@@ -31,6 +32,7 @@ import {
   Loader2,
   FolderOpen,
 } from "lucide-react";
+import { Badminton } from "@/components/icons/badminton";
 
 interface CategoryManagerProps {
   initialCategories: CategoryData[];
@@ -42,8 +44,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Car,
   ShoppingBag,
   Gamepad2,
+  Badminton,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,
@@ -161,7 +165,15 @@ export function CategoryManager({ initialCategories, onRefresh }: CategoryManage
                       <IconComp className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="text-base font-bold text-foreground">{c.name}</h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-base font-bold text-foreground">{c.name}</h4>
+                        <span
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/50"
+                          title={`Thứ tự ưu tiên: ${c.order}`}
+                        >
+                          #{c.order}
+                        </span>
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         {c.isDefault ? "Hệ thống mặc định" : "Cá nhân tự tạo"}
                       </p>

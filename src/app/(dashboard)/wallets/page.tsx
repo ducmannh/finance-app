@@ -5,6 +5,8 @@ import { WalletCard } from "@/components/wallet/wallet-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet, Info } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Ví cá nhân | My Finance App",
   description: "Quản lý số dư Ví cá nhân chính",

@@ -18,6 +18,7 @@ import {
   Gamepad2,
   Home,
   HeartPulse,
+  Heart,
   Briefcase,
   Gift,
   TrendingUp,
@@ -29,6 +30,7 @@ import {
   Coffee,
   Shirt,
 } from "lucide-react";
+import { Badminton } from "@/components/icons/badminton";
 
 interface TransactionFilterProps {
   categories: CategoryData[];
@@ -48,8 +50,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Car,
   ShoppingBag,
   Gamepad2,
+  Badminton,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,

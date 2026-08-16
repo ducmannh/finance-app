@@ -24,6 +24,7 @@ import {
   Gamepad2,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,
@@ -37,6 +38,7 @@ import {
   Shirt,
   CalendarDays,
 } from "lucide-react";
+import { Badminton } from "@/components/icons/badminton";
 
 interface TransactionDialogProps {
   transaction?: TransactionData | null;
@@ -52,8 +54,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Car,
   ShoppingBag,
   Gamepad2,
+  Badminton,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,

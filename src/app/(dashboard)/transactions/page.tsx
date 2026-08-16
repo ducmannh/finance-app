@@ -5,6 +5,8 @@ import { getCategoriesAction } from "@/actions/category";
 import { TransactionManager } from "@/components/transaction/transaction-manager";
 import { ArrowLeftRight } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Giao dịch Thu / Chi | My Finance App",
   description: "Quản lý ghi nhận thu nhập và chi tiêu cá nhân",

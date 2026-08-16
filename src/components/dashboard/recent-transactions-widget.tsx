@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { TransactionData } from "@/actions/transaction";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowRight, Receipt, Clock, Tag, Utensils, Car, ShoppingBag, Gamepad2, Home, HeartPulse, Briefcase, Gift, TrendingUp, Coins, Coffee, BookOpen, Plane, Music, Zap, Shirt } from "lucide-react";
+import { ArrowRight, Receipt, Clock, Tag, Utensils, Car, ShoppingBag, Gamepad2, Home, HeartPulse, Heart, Briefcase, Gift, TrendingUp, Coins, Coffee, BookOpen, Plane, Music, Zap, Shirt } from "lucide-react";
+import { Badminton } from "@/components/icons/badminton";
 
 interface RecentTransactionsWidgetProps {
   transactions: TransactionData[];
@@ -14,8 +15,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Car,
   ShoppingBag,
   Gamepad2,
+  Badminton,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,

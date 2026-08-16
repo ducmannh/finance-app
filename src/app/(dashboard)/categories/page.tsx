@@ -4,6 +4,8 @@ import { getCategoriesAction } from "@/actions/category";
 import { CategoryManager } from "@/components/category/category-manager";
 import { FolderKanban } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Danh mục Thu / Chi | My Finance App",
   description: "Quản lý danh mục phân loại thu nhập và chi tiêu cá nhân",

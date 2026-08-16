@@ -6,6 +6,8 @@ import { ChangePasswordForm } from "@/components/profile/change-password-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, KeyRound, ShieldAlert } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Hồ sơ cá nhân | My Finance App",
   description: "Quản lý thông tin cá nhân và đổi mật khẩu tài khoản",

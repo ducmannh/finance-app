@@ -10,6 +10,7 @@ export const createCategorySchema = z.object({
   type: categoryTypeEnum,
   icon: z.string().min(1, "Vui lòng chọn biểu tượng"),
   color: z.string().min(1, "Vui lòng chọn màu sắc"),
+  order: z.coerce.number().int().min(0, "Thứ tự phải lớn hơn hoặc bằng 0").default(0),
 });
 
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;

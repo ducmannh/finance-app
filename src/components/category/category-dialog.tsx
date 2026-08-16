@@ -18,6 +18,7 @@ import {
   Gamepad2,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,
@@ -30,6 +31,7 @@ import {
   Coffee,
   Shirt,
 } from "lucide-react";
+import { Badminton } from "@/components/icons/badminton";
 
 interface CategoryDialogProps {
   category?: CategoryData | null;
@@ -44,12 +46,13 @@ const PRESET_ICONS = [
   { id: "Car", Icon: Car, label: "Di chuyển" },
   { id: "ShoppingBag", Icon: ShoppingBag, label: "Mua sắm" },
   { id: "Gamepad2", Icon: Gamepad2, label: "Giải trí" },
+  { id: "Badminton", Icon: Badminton, label: "Cầu lông" },
   { id: "Home", Icon: Home, label: "Nhà cửa" },
   { id: "HeartPulse", Icon: HeartPulse, label: "Sức khỏe" },
+  { id: "Heart", Icon: Heart, label: "Tình yêu" },
   { id: "Tag", Icon: Tag, label: "Khác" },
   { id: "Briefcase", Icon: Briefcase, label: "Lương" },
   { id: "Gift", Icon: Gift, label: "Thưởng" },
-  { id: "TrendingUp", Icon: TrendingUp, label: "Đầu tư" },
   { id: "Coins", Icon: Coins, label: "Tiết kiệm" },
   { id: "Coffee", Icon: Coffee, label: "Cà phê" },
   { id: "BookOpen", Icon: BookOpen, label: "Học tập" },
@@ -95,6 +98,7 @@ export function CategoryDialog({
       type: defaultType,
       color: defaultType === "INCOME" ? "#10B981" : "#EF4444",
       icon: defaultType === "INCOME" ? "Briefcase" : "Utensils",
+      order: 0,
     },
   });
 
@@ -108,12 +112,14 @@ export function CategoryDialog({
       setValue("type", category.type);
       setValue("color", category.color);
       setValue("icon", category.icon);
+      setValue("order", category.order ?? 0);
     } else {
       reset({
         name: "",
         type: defaultType,
         color: defaultType === "INCOME" ? "#10B981" : "#EF4444",
         icon: defaultType === "INCOME" ? "Briefcase" : "Utensils",
+        order: 0,
       });
     }
   }, [category, defaultType, isOpen, reset, setValue]);
@@ -210,22 +216,45 @@ export function CategoryDialog({
               </div>
             </div>
 
-            {/* Tên danh mục */}
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                Tên danh mục
-              </Label>
-              <Input
-                id="name"
-                placeholder="VD: Ăn sáng, Tiền điện, Cà phê..."
-                {...register("name")}
-                disabled={loading}
-                className={errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
-              />
-              {errors.name && (
-                <p className="text-xs text-destructive font-medium">{errors.name.message}</p>
-              )}
+            {/* Tên danh mục & Thứ tự hiển thị */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2 space-y-1.5">
+                <Label htmlFor="name" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Tên danh mục
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="VD: Ăn sáng, Cà phê..."
+                  {...register("name")}
+                  disabled={loading}
+                  className={errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
+                />
+                {errors.name && (
+                  <p className="text-xs text-destructive font-medium">{errors.name.message}</p>
+                )}
+              </div>
+
+              <div className="col-span-1 space-y-1.5">
+                <Label htmlFor="order" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Thứ tự
+                </Label>
+                <Input
+                  id="order"
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  {...register("order")}
+                  disabled={loading}
+                  className={errors.order ? "border-destructive focus-visible:ring-destructive" : ""}
+                />
+                {errors.order && (
+                  <p className="text-xs text-destructive font-medium">{errors.order.message}</p>
+                )}
+              </div>
             </div>
+            <p className="text-[11px] text-muted-foreground -mt-2">
+              💡 Số nhỏ hơn sẽ hiển thị trước (VD: 0, 1, 2, 3...)
+            </p>
 
             {/* Chọn Biểu tượng */}
             <div className="space-y-1.5">

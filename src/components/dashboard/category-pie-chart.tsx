@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { CategoryBreakdownItem } from "@/actions/analytics";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PieChart as PieChartIcon, Tag, Utensils, Car, ShoppingBag, Gamepad2, Home, HeartPulse, Briefcase, Gift, TrendingUp, Coins, Coffee, BookOpen, Plane, Music, Zap, Shirt } from "lucide-react";
+import { PieChart as PieChartIcon, Tag, Utensils, Car, ShoppingBag, Gamepad2, Home, HeartPulse, Heart, Briefcase, Gift, TrendingUp, Coins, Coffee, BookOpen, Plane, Music, Zap, Shirt } from "lucide-react";
+import { Badminton } from "@/components/icons/badminton";
 
 interface CategoryPieChartProps {
   categoryExpenses: CategoryBreakdownItem[];
@@ -17,8 +18,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Car,
   ShoppingBag,
   Gamepad2,
+  Badminton,
   Home,
   HeartPulse,
+  Heart,
   Tag,
   Briefcase,
   Gift,
