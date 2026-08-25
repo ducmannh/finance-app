@@ -13,10 +13,11 @@ import { IncomeExpenseChart } from "@/components/dashboard/income-expense-chart"
 import { RecentTransactionsWidget } from "@/components/dashboard/recent-transactions-widget";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { DatePicker } from "@/components/ui/date-picker";
-import { LayoutDashboard, RefreshCw, Plus, Filter } from "lucide-react";
+import { LayoutDashboard, RefreshCw, Plus, Filter, Landmark, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { usePendingTransactions } from "@/components/bank-sync/pending-transactions-provider";
 
 interface AnalyticsDashboardProps {
   userName: string;
@@ -50,6 +51,7 @@ const parseYYYYMMDDToDate = (str: string) => {
 };
 
 export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
+  const { pendingCount } = usePendingTransactions();
   const [period, setPeriod] = useState<PeriodFilter>("THIS_MONTH");
 
   // State cho chọn Tháng cụ thể (Định dạng YYYY-MM)
@@ -102,6 +104,34 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
 
   return (
     <div className="space-y-8 pb-10">
+      {/* Pending Bank Transactions Notification Banner */}
+      {pendingCount > 0 && (
+        <div className="p-4 rounded-2xl bg-linear-to-r from-amber-500/10 via-primary/10 to-emerald-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs animate-in fade-in-0 slide-in-from-top-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0">
+              <Landmark className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                Phát hiện {pendingCount} biến động số dư ngân hàng chưa xử lý
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white animate-pulse">
+                  Mới
+                </span>
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Bấm vào để tạo hóa đơn chi tiêu hoặc xác nhận nguồn thu chỉ với 1-chạm.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/bank-sync"
+            className="text-xs font-bold px-3.5 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all flex items-center gap-1 shrink-0 shadow-xs"
+          >
+            Xử lý ngay <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
+
       {/* Top Header & Period Selector */}
       <div className="flex flex-col gap-4 border-b border-border/40 pb-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

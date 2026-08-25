@@ -5,7 +5,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserNavDropdown } from "@/components/layout/user-nav-dropdown";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { Wallet, LayoutDashboard, ArrowLeftRight, FolderKanban } from "lucide-react";
+import { usePendingTransactions } from "@/components/bank-sync/pending-transactions-provider";
+import {
+  Wallet,
+  LayoutDashboard,
+  ArrowLeftRight,
+  FolderKanban,
+  Landmark,
+  Sparkles,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface NavbarProps {
   userName?: string;
@@ -13,6 +22,7 @@ interface NavbarProps {
 
 export function Navbar({ userName }: NavbarProps) {
   const pathname = usePathname();
+  const { pendingCount } = usePendingTransactions();
 
   const navLinks = [
     {
@@ -24,6 +34,12 @@ export function Navbar({ userName }: NavbarProps) {
       href: "/transactions",
       label: "Giao dịch",
       icon: ArrowLeftRight,
+    },
+    {
+      href: "/bank-sync",
+      label: "Biến động NH",
+      icon: Landmark,
+      badge: pendingCount > 0 ? pendingCount : undefined,
     },
     {
       href: "/categories",
@@ -62,7 +78,7 @@ export function Navbar({ userName }: NavbarProps) {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
                       isActive
                         ? "bg-primary/10 text-primary font-bold shadow-xs"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -70,6 +86,11 @@ export function Navbar({ userName }: NavbarProps) {
                   >
                     <Icon className="h-4 w-4" />
                     {link.label}
+                    {link.badge !== undefined && (
+                      <span className="ml-1 px-1.5 py-0.5 text-[10px] font-extrabold rounded-full bg-rose-500 text-white animate-pulse">
+                        {link.badge}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -86,7 +107,7 @@ export function Navbar({ userName }: NavbarProps) {
 
       {/* Mobile Bottom Navigation Bar (App-like feel for Mobile < 768px) */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t border-border/50 md:hidden pb-safe px-2 py-1.5 shadow-2xl">
-        <div className="grid grid-cols-4 items-center">
+        <div className="grid grid-cols-5 items-center">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
@@ -94,20 +115,25 @@ export function Navbar({ userName }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-[11px] font-bold transition-all ${
+                className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-[10px] font-bold transition-all ${
                   isActive
                     ? "text-primary scale-105"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <div
-                  className={`p-1.5 rounded-xl transition-all ${
+                  className={`p-1.5 rounded-xl transition-all relative ${
                     isActive ? "bg-primary/15" : "bg-transparent"
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-4.5 w-4.5" />
+                  {link.badge !== undefined && (
+                    <span className="absolute -top-1 -right-1 px-1 min-w-3.5 text-[9px] font-extrabold rounded-full bg-rose-500 text-white flex items-center justify-center">
+                      {link.badge}
+                    </span>
+                  )}
                 </div>
-                <span className="mt-0.5">{link.label}</span>
+                <span className="mt-0.5 truncate max-w-[56px] text-center">{link.label}</span>
               </Link>
             );
           })}
@@ -116,3 +142,4 @@ export function Navbar({ userName }: NavbarProps) {
     </>
   );
 }
+

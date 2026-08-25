@@ -8,7 +8,9 @@ import { TransactionList } from "@/components/transaction/transaction-list";
 import { TransactionDialog } from "@/components/transaction/transaction-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, TrendingUp, TrendingDown, ArrowUpDown } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, ArrowUpDown, Landmark } from "lucide-react";
+import Link from "next/link";
+import { usePendingTransactions } from "@/components/bank-sync/pending-transactions-provider";
 
 interface TransactionManagerProps {
   initialTransactions: TransactionData[];
@@ -23,6 +25,7 @@ export function TransactionManager({
   initialTotalIncome,
   initialTotalExpense,
 }: TransactionManagerProps) {
+  const { pendingCount } = usePendingTransactions();
   const [transactions, setTransactions] = useState<TransactionData[]>(initialTransactions);
   const [categories, setCategories] = useState<CategoryData[]>(initialCategories);
   const [totalIncome, setTotalIncome] = useState<number>(initialTotalIncome);
@@ -219,9 +222,23 @@ export function TransactionManager({
             onDateRangeChange={handleDateRangeChange}
           />
         </div>
-        <Button onClick={handleCreate} size="lg" className="gap-2 font-bold shrink-0">
-          <Plus className="h-5 w-5" /> Thêm giao dịch
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/bank-sync"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/15 text-primary text-sm font-bold shadow-xs transition-all shrink-0"
+          >
+            <Landmark className="h-4 w-4" />
+            <span>Biến động NH</span>
+            {pendingCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-500 text-white animate-pulse">
+                {pendingCount}
+              </span>
+            )}
+          </Link>
+          <Button onClick={handleCreate} size="lg" className="gap-2 font-bold shrink-0 rounded-xl">
+            <Plus className="h-5 w-5" /> Thêm giao dịch
+          </Button>
+        </div>
       </div>
 
       {/* Transaction List */}

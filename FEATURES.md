@@ -32,62 +32,59 @@ Tài liệu này ghi nhận toàn bộ định hướng tính năng của ứng 
 
 ---
 
-## 📈 Giai Đoạn 2: Nâng Cao & Quản Lý Kế Hoạch (Advanced Features)
-> *Mục tiêu: Hỗ trợ kiểm soát ngân sách, lập kế hoạch và nhắc nhở tự động.*
+## ⚡ Giai Đoạn 2: Tự Động Hóa Biến Động Số Dư & Nhập Liệu 1-Chạm (Bank Sync & Quick Entry)
+> *Mục tiêu: Khi có biến động tài khoản ngân hàng (chuyển tiền đi / nhận tiền đến), hệ thống lập tức bắt tín hiệu, gửi thông báo thời gian thực và tự động điền sẵn thông tin để người dùng tạo hóa đơn/khoản thu - chi chỉ với 1-2 thao tác.*
 
-### 2.1 Lập Ngân Sách & Hạn Mức Chi Tiêu (Budgeting)
-- [ ] Đặt hạn mức chi tiêu theo Tháng / Tuần cho toàn bộ hoặc từng danh mục cụ thể.
-- [ ] Theo dõi phần trăm hoàn thành ngân sách theo thời gian thực.
-- [ ] Cảnh báo thông báo (Notification) khi đạt mức 80%, 90% hoặc vượt ngân sách.
+### 2.1 Cổng Tiếp Nhận Biến Động Số Dư (Bank Webhook & Integration)
+- [x] Xây dựng Webhook API tiếp nhận biến động số dư tức thời từ ngân hàng / bên thứ 3 (Open Banking / SePay / Casso / SMS Parser).
+- [x] Bảo mật Webhook qua API Key, Secret Token và xác thực chữ ký (Signature verification).
+- [x] Tích hợp công cụ **Giả lập biến động số dư (Bank Transaction Simulator)** ngay trong ứng dụng để test nhanh các kịch bản chuyển/nhận tiền.
 
-### 2.2 Thu Chi Định Kỳ & Hóa Đơn (Recurring Transactions & Bills)
-- [ ] Thiết lập giao dịch tự động lặp lại (Tiền nhà, tiền điện, gói mạng, lương tháng...).
-- [ ] Nhắc nhở lịch thanh toán hóa đơn sắp đến hạn.
+### 2.2 Hệ Thống Thông Báo Biến Động Thời Gian Thực (Real-Time Notifications)
+- [x] Bắn thông báo ngay tức thì (In-app Notification, Banner / Toast / Push Notification) khi phát hiện phát sinh giao dịch mới.
+- [x] Hiển thị huy hiệu (Badge count) thông báo số lượng giao dịch ngân hàng mới đang chờ xử lý trên giao diện.
 
-### 2.3 Mục Tiêu Tiết Kiệm (Savings Goals)
-- [ ] Tạo mục tiêu tiết kiệm (Mua xe, Du lịch, Quỹ khẩn cấp...).
-- [ ] Ghi nhận số tiền nạp vào mục tiêu và theo dõi tiến độ %.
+### 2.3 Luồng Tự Động Điền & Thêm Hóa Đơn Chi Tiêu (Tiền Chuyển Đi - EXPENSE)
+- [x] **Tự động trích xuất**: Số tiền chuyển đi, thời gian giao dịch, số tài khoản nhận và nội dung chuyển khoản.
+- [x] **Tự động hiển thị & điền sẵn form hóa đơn**: Mở modal/drawer "Phát hiện chi tiêu mới" với số tiền và mô tả được điền sẵn 100%.
+- [x] **Thao tác tối giản**: Người dùng chỉ cần chọn nhanh Danh mục chi tiêu (hoặc dùng gợi ý sẵn), chỉnh sửa thêm ghi chú (nếu muốn) và 1-click bấm "Lưu hóa đơn" vào Ví.
 
-### 2.4 Quản Lý Nợ & Cho Vay (Debts & Loans)
-- [ ] Quản lý khoản vay (Đi vay) và Cho mượn (Cho vay).
-- [ ] Ghi nhận tiến độ trả nợ/thu nợ từng phần.
-- [ ] Nhắc nhở lịch đòi nợ/trả nợ đúng hạn.
+### 2.4 Luồng Tự Động Tạo Giao Diện & Ghi Nhận Thu Nhập (Tiền Nhận Đến - INCOME)
+- [x] **Tự động phát hiện biến động cộng tiền**: Trích xuất số tiền nhận, người chuyển, nội dung và thời gian.
+- [x] **Tự động hiển thị giao diện xác nhận thu nhập**: Bật cửa sổ thông báo ghi nhận nguồn thu mới.
+- [x] **Thao tác tối giản**: Form đã điền sẵn số tiền, người dùng chỉ cần phân loại Danh mục thu nhập (Lương, Thưởng, Chuyển khoản, Hoàn tiền...) và bấm "Xác nhận thu nhập" để cộng số dư vào Ví.
 
-### 2.5 Báo Cáo Chuyên Sâu & Xuất Dữ Liệu (Import / Export)
-- [ ] Xuất báo cáo dữ liệu tài chính ra định dạng **Excel (.xlsx)** hoặc **PDF**.
-- [ ] So sánh xu hướng chi tiêu giữa các tháng/kỳ tài chính.
-
-### 2.6 Đa Tiền Tệ & Tỷ Giá (Multi-Currency)
-- [ ] Hỗ trợ nhiều loại tiền tệ (VND, USD, EUR...).
-- [ ] Tự động chuyển đổi số dư theo tỷ giá thị trường.
+### 2.5 Hộp Thư Giao Dịch Chờ Xử Lý (Pending Transactions Inbox)
+- [x] Quản lý danh sách các biến động số dư chưa được chuyển thành hóa đơn/giao dịch chính thức.
+- [x] Tính năng thao tác nhanh: "Xác nhận nhanh", "Chỉnh sửa chi tiết", "Bỏ qua / Ẩn (Ignore)".
+- [x] Hỗ trợ xử lý và phân loại hàng loạt (Batch approval).
 
 ---
 
-## 🤖 Giai Đoạn 3: Tự Động Hóa & Trợ Lý Thông Minh (AI Features)
-> *Mục tiêu: Nhập liệu nhanh chóng, phân tích thói quen và đưa ra khuyến nghị tài chính.*
+## 🤖 Giai Đoạn 3: Trí Tuệ Nhân Tạo & Tự Động Hóa Nâng Cao (Smart AI & Automation)
+> *Mục tiêu: Tự động phân loại danh mục theo ngữ cảnh, quét hóa đơn bằng AI và đối soát tài chính thông minh.*
 
-### 3.1 Quét Hóa Đơn Bằng AI (OCR Invoice Scanning)
-- [ ] Chụp ảnh hóa đơn/biên lai, AI tự nhận diện số tiền, ngày tháng, cửa hàng và gợi ý danh mục.
+### 3.1 Tự Động Phân Loại Bằng Quy Tắc & Học Máy (Smart Auto-Categorization)
+- [ ] **Bộ quy tắc nhận diện từ khóa (Rule-based matching)**: Tự động phát hiện từ khóa trong nội dung CK (VD: *"Grab"*, *"Shopee"*, *"Highlands"*, *"Tien nha"*, *"Luong thang 8"*...) để tự gán sẵn Danh mục mà người dùng không cần chọn tay.
+- [ ] **Học thói quen người dùng**: Ghi nhớ lịch sử phân loại của từng số tài khoản thụ hưởng/người gửi để tự động áp dụng cho các lần sau.
 
-### 3.2 Nhập Liệu Bằng Giọng Nói / Chatbot AI
-- [ ] Thêm giao dịch qua câu lệnh giọng nói hoặc tin nhắn chat (VD: *"Hôm nay ăn trưa 45k"*).
+### 3.2 Nhận Diện Giao Dịch Từ Ảnh Chụp Biên Lai / App Ngân Hàng (OCR Receipt Scanning)
+- [ ] Tải lên ảnh chụp màn hình chuyển khoản thành công từ app ngân hàng hoặc hóa đơn mua sắm.
+- [ ] AI OCR tự động quét trích xuất: Số tiền, thời gian, người nhận/gửi, nội dung -> Tự tạo giao diện giao dịch chờ xác nhận.
 
-### 3.3 Trợ Lý Tài Chính Thông Minh (AI Financial Assistant)
-- [ ] Phân tích thói quen tiêu dùng cá nhân.
-- [ ] Đưa ra cảnh báo thông minh (VD: *"Bạn đang chi cho mua sắm gấp 2 lần bình thường tháng này"*).
-- [ ] Gợi ý kế hoạch phân bổ dòng tiền (Quy tắc 50/30/20, 6 hũ tài chính...).
-
-### 3.4 Quản Lý Chi Tiêu Nhóm / Gia Đình (Shared Household Budget)
-- [ ] Tạo ví chung cho Vợ/Chồng hoặc Nhóm bạn.
-- [ ] Phân quyền xem / chỉnh sửa / duyệt giao dịch trong ví chung.
+### 3.3 Đối Soát Dòng Tiền & Cảnh Báo Tài Chính (Reconciliation & Insights)
+- [ ] Đối soát số dư thực tế tại ngân hàng so với số dư quản lý trên ứng dụng.
+- [ ] Cảnh báo chi tiêu bất thường hoặc dòng tiền sụt giảm mạnh sau các giao dịch chuyển tiền lớn.
+- [ ] Báo cáo phân tích chuyên sâu các nguồn tiền vào - ra tự động.
 
 ---
 
 ## 🗄️ Mô Hình Dữ Liệu Tham Chiếu (Database Entities)
-- **User**: Người dùng
-- **Wallet**: Ví tiền / Tài khoản
-- **Category**: Danh mục Thu/Chi
-- **Transaction**: Giao dịch
-- **Budget**: Ngân sách
-- **Goal**: Mục tiêu tiết kiệm
-- **DebtLoan**: Quản lý vay/nợ
+- **User**: Người dùng hệ thống
+- **Wallet**: Ví tiền / Tài khoản cá nhân
+- **Category**: Danh mục Thu / Chi
+- **Transaction**: Giao dịch thu chi chính thức
+- **PendingTransaction**: Biến động số dư ngân hàng chờ người dùng xác nhận
+- **BankWebhookLog**: Lịch sử webhook / log biến động số dư từ ngân hàng
+- **CategorizationRule**: Quy tắc tự động gán danh mục theo từ khóa nội dung CK
+
