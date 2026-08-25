@@ -157,7 +157,7 @@ export function TransactionFilter({
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-3 rounded-2xl bg-card/95 border border-border/60 shadow-xs backdrop-blur relative">
       {/* 1. Ô tìm kiếm ghi chú & số tiền (Full width trên di động) */}
-      <div className="relative flex-1 min-w-[140px] w-full sm:w-auto">
+      <div className="relative flex-1 min-w-35 w-full sm:w-auto">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
         <Input
           placeholder="Tìm kiếm theo ghi chú, số tiền"
@@ -225,7 +225,7 @@ export function TransactionFilter({
                 setIsCategoryOpen(!isCategoryOpen);
                 setIsDateOpen(false);
               }}
-              className="flex items-center justify-between gap-1.5 h-8.5 px-3 rounded-xl border border-border/60 bg-muted/40 hover:bg-muted/80 text-xs font-semibold transition-all cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:max-w-[170px]"
+              className="flex items-center justify-between gap-1.5 h-8.5 px-3 rounded-xl border border-border/60 bg-muted/40 hover:bg-muted/80 text-xs font-semibold transition-all cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:max-w-42.5"
             >
               <div className="flex items-center gap-1.5 truncate">
                 {selectedCategoryObj ? (

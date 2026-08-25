@@ -167,7 +167,7 @@ export function PendingTransactionsProvider({ children }: { children: React.Reac
             <div
               key={tx.id}
               onClick={() => handleNotificationClick(tx)}
-              className="pointer-events-auto group cursor-pointer relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-background/95 p-4 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-primary w-full animate-in slide-in-from-top-8 fade-in-0 duration-300 ring-4 ring-primary/10"
+              className="pointer-events-auto group cursor-pointer relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-background/95 p-4 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-primary w-full animate-in slide-in-from-top-8 fade-in-0 ring-4 ring-primary/10"
             >
               {/* Highlight bar top */}
               <div

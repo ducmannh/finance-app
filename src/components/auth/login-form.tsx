@@ -143,7 +143,7 @@ export function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full h-11 text-base font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 border-0 rounded-xl transition-all active:scale-[0.99]"
+              className="w-full h-11 text-base font-semibold bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 border-0 rounded-xl transition-all active:scale-[0.99]"
               disabled={isLoading}
             >
               {isLoading ? (

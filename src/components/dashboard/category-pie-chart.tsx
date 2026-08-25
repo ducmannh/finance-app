@@ -112,60 +112,60 @@ export function CategoryPieChart({
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 flex-1 flex flex-col justify-between space-y-6">
+      <CardContent className="p-5 sm:p-8 flex-1 flex flex-col justify-between space-y-6">
         {currentItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground space-y-2 my-auto">
-            <div className="p-3 rounded-full bg-muted/60">
-              <PieChartIcon className="h-6 w-6 text-muted-foreground/60" />
+          <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground space-y-3 my-auto">
+            <div className="p-4 rounded-full bg-muted/60">
+              <PieChartIcon className="h-8 w-8 text-muted-foreground/60" />
             </div>
-            <p className="text-sm font-medium">Chưa có dữ liệu {isExpense ? "chi tiêu" : "thu nhập"} trong kỳ này</p>
+            <p className="text-sm font-semibold">Chưa có dữ liệu {isExpense ? "chi tiêu" : "thu nhập"} trong kỳ này</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            {/* CSS Conic Donut Chart Container */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* CSS Conic Donut Chart Container - To và Nổi Bật */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-center relative py-4">
               <div
-                className="relative w-44 h-44 rounded-full flex items-center justify-center shadow-md p-1.5 transition-all duration-300"
+                className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full flex items-center justify-center shadow-lg p-2.5 transition-all duration-300"
                 style={conicGradientStyle}
               >
                 {/* Lỗ rỗng trung tâm Donut */}
-                <div className="w-32 h-32 rounded-full bg-card shadow-inner flex flex-col items-center justify-center text-center p-2 z-10">
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Tổng {isExpense ? "Chi" : "Thu"}
+                <div className="w-40 h-40 sm:w-44 sm:h-44 rounded-full bg-card shadow-inner flex flex-col items-center justify-center text-center p-3 z-10 border border-border/40">
+                  <span className="text-[11px] sm:text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    Tổng {isExpense ? "Chi Tiêu" : "Thu Nhập"}
                   </span>
-                  <span className="text-sm font-extrabold font-mono text-foreground mt-0.5 max-w-[110px] truncate">
+                  <span className="text-base sm:text-xl font-black font-mono text-foreground mt-1 max-w-37.5 truncate">
                     {formatVND(currentTotal)}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Danh sách Chú thích (Legend) */}
-            <div className="md:col-span-7 space-y-3 max-h-[260px] overflow-y-auto pr-1">
+            {/* Danh sách Chú thích (Legend & Breakdown) */}
+            <div className="lg:col-span-7 space-y-3.5 max-h-90 overflow-y-auto pr-1.5 scrollbar-thin">
               {currentItems.map((item) => {
                 const IconComp = ICON_MAP[item.icon] || Tag;
 
                 return (
-                  <div key={item.categoryId} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 truncate">
+                  <div key={item.categoryId} className="space-y-1.5 p-2 rounded-xl hover:bg-muted/40 transition-colors">
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
+                      <div className="flex items-center gap-2.5 truncate">
                         <div
-                          className="p-1.5 rounded-lg text-white shrink-0 shadow-2xs"
+                          className="p-2 rounded-xl text-white shrink-0 shadow-xs"
                           style={{ backgroundColor: item.color }}
                         >
-                          <IconComp className="h-3.5 w-3.5" />
+                          <IconComp className="h-4 w-4" />
                         </div>
-                        <span className="font-semibold text-foreground truncate">{item.categoryName}</span>
-                        <span className="text-[10px] font-medium text-muted-foreground">({item.transactionCount} lượt)</span>
+                        <span className="font-bold text-foreground truncate">{item.categoryName}</span>
+                        <span className="text-[11px] font-medium text-muted-foreground">({item.transactionCount} giao dịch)</span>
                       </div>
-                      <div className="flex items-center gap-2 font-mono font-bold shrink-0">
-                        <span className="text-muted-foreground text-[11px]">{item.percentage}%</span>
-                        <span className="text-foreground">{formatVND(item.totalAmount)}</span>
+                      <div className="flex items-center gap-2.5 font-mono font-bold shrink-0">
+                        <span className="text-muted-foreground text-xs sm:text-sm font-semibold">{item.percentage}%</span>
+                        <span className="text-foreground text-xs sm:text-sm">{formatVND(item.totalAmount)}</span>
                       </div>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+                    {/* Progress Bar To Rõ Hơn */}
+                    <div className="w-full h-2 rounded-full bg-muted/80 overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{

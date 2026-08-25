@@ -13,8 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function TransactionsPage() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const lastDay = new Date(currentYear, currentMonth, 0).getDate();
+  const startDate = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
+  const endDate = `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
   const [transResult, catResult] = await Promise.all([
-    getTransactionsAction(),
+    getTransactionsAction({ startDate, endDate }),
     getCategoriesAction(),
   ]);
 
@@ -30,14 +37,14 @@ export default async function TransactionsPage() {
   const totalExpense = transResult.totalExpense || 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-border/40 pb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-          <ArrowLeftRight className="h-8 w-8 text-primary" /> Quản Lý Giao Dịch Thu / Chi
+      <div className="border-b border-border/40 pb-4">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground flex items-center gap-2.5">
+          <ArrowLeftRight className="h-7 w-7 text-primary shrink-0" /> Quản Lý Giao Dịch Thu / Chi
         </h1>
-        <p className="text-muted-foreground mt-1">
-          Ghi nhận các khoản Thu nhập và Chi tiêu cá nhân, tự động cập nhật số dư Ví chính.
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+          Ghi nhận các khoản Thu nhập và Chi tiêu cá nhân, tự động cập nhật số dư Ví chính theo từng tháng.
         </p>
       </div>
 
@@ -46,6 +53,8 @@ export default async function TransactionsPage() {
         initialCategories={categories}
         initialTotalIncome={totalIncome}
         initialTotalExpense={totalExpense}
+        initialYear={currentYear}
+        initialMonth={currentMonth}
       />
     </div>
   );

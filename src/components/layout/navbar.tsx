@@ -133,7 +133,7 @@ export function Navbar({ userName }: NavbarProps) {
                     </span>
                   )}
                 </div>
-                <span className="mt-0.5 truncate max-w-[56px] text-center">{link.label}</span>
+                <span className="mt-0.5 truncate max-w-14 text-center">{link.label}</span>
               </Link>
             );
           })}

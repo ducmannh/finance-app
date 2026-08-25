@@ -6,11 +6,8 @@ import {
   AnalyticsSummary,
   PeriodFilter,
 } from "@/actions/analytics";
-import { getTransactionsAction, TransactionData } from "@/actions/transaction";
 import { StatCards } from "@/components/dashboard/stat-cards";
 import { CategoryPieChart } from "@/components/dashboard/category-pie-chart";
-import { IncomeExpenseChart } from "@/components/dashboard/income-expense-chart";
-import { RecentTransactionsWidget } from "@/components/dashboard/recent-transactions-widget";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { DatePicker } from "@/components/ui/date-picker";
 import { LayoutDashboard, RefreshCw, Plus, Filter, Landmark, ArrowRight } from "lucide-react";
@@ -68,28 +65,20 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
   const [endDateStr, setEndDateStr] = useState<string>(todayStr);
 
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
-  const [recentTransactions, setRecentTransactions] = useState<TransactionData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [analyticsRes, transactionsRes] = await Promise.all([
-        getAnalyticsSummaryAction({
-          period,
-          selectedMonth,
-          startDate: startDateStr,
-          endDate: endDateStr,
-        }),
-        getTransactionsAction(),
-      ]);
+      const analyticsRes = await getAnalyticsSummaryAction({
+        period,
+        selectedMonth,
+        startDate: startDateStr,
+        endDate: endDateStr,
+      });
 
       if (analyticsRes.success && analyticsRes.data) {
         setAnalytics(analyticsRes.data);
-      }
-
-      if (transactionsRes.success && transactionsRes.transactions) {
-        setRecentTransactions(transactionsRes.transactions);
       }
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
@@ -231,26 +220,15 @@ export function AnalyticsDashboard({ userName }: AnalyticsDashboardProps) {
         netSavings={analytics?.netSavings ?? 0}
       />
 
-      {/* 2. Charts Section Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Biểu đồ Cơ cấu Chi tiêu (Donut Chart) */}
-        <div className="lg:col-span-6 flex flex-col">
-          <CategoryPieChart
-            categoryExpenses={analytics?.categoryExpenses ?? []}
-            categoryIncomes={analytics?.categoryIncomes ?? []}
-            totalExpense={analytics?.totalExpense ?? 0}
-            totalIncome={analytics?.totalIncome ?? 0}
-          />
-        </div>
-
-        {/* Biểu đồ Biến động Thu - Chi (Bar Chart) */}
-        <div className="lg:col-span-6 flex flex-col">
-          <IncomeExpenseChart timeSeries={analytics?.timeSeries ?? []} />
-        </div>
+      {/* 2. Biểu đồ Cơ Cấu Theo Danh Mục (Donut Chart & Breakdown) */}
+      <div className="w-full">
+        <CategoryPieChart
+          categoryExpenses={analytics?.categoryExpenses ?? []}
+          categoryIncomes={analytics?.categoryIncomes ?? []}
+          totalExpense={analytics?.totalExpense ?? 0}
+          totalIncome={analytics?.totalIncome ?? 0}
+        />
       </div>
-
-      {/* 3. Recent Transactions Widget */}
-      <RecentTransactionsWidget transactions={recentTransactions} />
     </div>
   );
 }

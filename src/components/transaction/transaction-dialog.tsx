@@ -81,6 +81,7 @@ export function TransactionDialog({
 }: TransactionDialogProps) {
   const [loading, setLoading] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [displayAmount, setDisplayAmount] = useState("");
 
   const {
     register,
@@ -105,21 +106,38 @@ export function TransactionDialog({
   const selectedCategory = watch("categoryId");
   const currentDate = watch("date");
 
+  // Xử lý tự động định dạng dấu chấm phân cách hàng nghìn
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, ""); // Lọc chỉ giữ chữ số
+    if (!raw) {
+      setDisplayAmount("");
+      setValue("amount", 0, { shouldValidate: true });
+      return;
+    }
+    const num = parseInt(raw, 10);
+    setDisplayAmount(num.toLocaleString("vi-VN"));
+    setValue("amount", num, { shouldValidate: true });
+  };
+
   useEffect(() => {
-    if (transaction) {
-      setValue("type", transaction.type);
-      setValue("amount", transaction.amount);
-      setValue("categoryId", transaction.categoryId);
-      setValue("date", new Date(transaction.date));
-      setValue("note", transaction.note || "");
-    } else {
-      reset({
-        type: "EXPENSE",
-        amount: 0,
-        categoryId: "",
-        date: new Date(),
-        note: "",
-      });
+    if (isOpen) {
+      if (transaction) {
+        setValue("type", transaction.type);
+        setValue("amount", transaction.amount);
+        setValue("categoryId", transaction.categoryId);
+        setValue("date", new Date(transaction.date));
+        setValue("note", transaction.note || "");
+        setDisplayAmount(transaction.amount ? transaction.amount.toLocaleString("vi-VN") : "");
+      } else {
+        reset({
+          type: "EXPENSE",
+          amount: 0,
+          categoryId: "",
+          date: new Date(),
+          note: "",
+        });
+        setDisplayAmount("");
+      }
     }
   }, [transaction, isOpen, reset, setValue]);
 
@@ -234,12 +252,13 @@ export function TransactionDialog({
                 </div>
                 <Input
                   id="amount"
-                  type="number"
-                  step="1000"
-                  placeholder="VD: 50000"
-                  {...register("amount")}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Nhập số tiền"
+                  value={displayAmount}
+                  onChange={handleAmountChange}
                   disabled={loading}
-                  className={`text-lg font-semibold h-10 ${
+                  className={`text-lg font-semibold font-mono h-10 ${
                     errors.amount ? "border-destructive focus-visible:ring-destructive" : ""
                   }`}
                 />
@@ -319,7 +338,7 @@ export function TransactionDialog({
                 </Label>
                 <Input
                   id="note"
-                  placeholder="VD: Ăn sáng phở bò, Tiền điện tháng 8..."
+                  placeholder="Nhập ghi chú (Tùy chọn)"
                   {...register("note")}
                   disabled={loading}
                 />

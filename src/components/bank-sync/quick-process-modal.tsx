@@ -120,17 +120,13 @@ export function QuickProcessModal({
   // Khi mở dialog hoặc pendingTx thay đổi, tự động điền form
   useEffect(() => {
     if (pendingTx && isOpen) {
-      const filteredCats = categories.filter((c) => c.type === pendingTx.type);
-      // Gợi ý danh mục đầu tiên nếu có
-      const defaultCatId = filteredCats.length > 0 ? filteredCats[0].id : "";
-
       reset({
         pendingId: pendingTx.id,
         type: pendingTx.type,
         amount: pendingTx.amount,
-        categoryId: defaultCatId,
+        categoryId: "", // Người dùng tự chọn danh mục
         date: new Date(pendingTx.createdAt),
-        note: pendingTx.content || "",
+        note: "", // Người dùng tự nhập ghi chú
       });
     }
   }, [pendingTx, isOpen, categories, reset]);
@@ -222,13 +218,15 @@ export function QuickProcessModal({
                 </p>
               </div>
             </div>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={onClose}
-              className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+              className="rounded-full p-2 h-8 w-8 hover:bg-muted cursor-pointer shrink-0"
             >
-              <X className="h-5 w-5" />
-            </button>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Form */}
@@ -343,7 +341,7 @@ export function QuickProcessModal({
                 <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="approve-note"
-                  placeholder="Ghi chú giao dịch..."
+                  placeholder="Nhập ghi chú (Tùy chọn)"
                   className="pl-10 text-sm"
                   {...register("note")}
                 />
@@ -362,50 +360,37 @@ export function QuickProcessModal({
               />
             </div>
 
-            {/* Footer Buttons */}
-            <div className="flex items-center justify-between gap-3 pt-3 border-t border-border/40">
+            {/* Footer Buttons - Đồng bộ style giống Form Thêm Giao Dịch */}
+            <div className="flex items-center justify-between gap-3 pt-4 border-t border-border/40">
               <Button
                 type="button"
                 variant="outline"
                 disabled={ignoring || loading}
                 onClick={handleIgnore}
-                className="text-xs font-semibold text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                className="cursor-pointer"
               >
-                {ignoring ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Ban className="h-3.5 w-3.5 mr-1" />}
-                Bỏ qua biến động
+                {ignoring ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang bỏ qua...
+                  </>
+                ) : (
+                  "Bỏ qua"
+                )}
               </Button>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={onClose}
-                  className="text-xs font-semibold rounded-xl"
-                >
-                  Đóng
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={loading || ignoring}
-                  className={`text-xs sm:text-sm font-bold rounded-xl shadow-xs ${
-                    isExpense
-                      ? "bg-rose-500 hover:bg-rose-600 text-white"
-                      : "bg-emerald-600 hover:bg-emerald-700 text-white"
-                  }`}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                      Đang xử lý...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="mr-1.5 h-4 w-4" />
-                      {isExpense ? "Lưu Hóa Đơn Chi Tiêu" : "Xác Nhận Thu Nhập"}
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Button
+                type="submit"
+                disabled={loading || ignoring}
+                className="font-bold cursor-pointer"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...
+                  </>
+                ) : (
+                  "Lưu giao dịch"
+                )}
+              </Button>
             </div>
           </form>
         </div>

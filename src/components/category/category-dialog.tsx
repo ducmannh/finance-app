@@ -224,7 +224,7 @@ export function CategoryDialog({
                 </Label>
                 <Input
                   id="name"
-                  placeholder="VD: Ăn sáng, Cà phê..."
+                  placeholder="Nhập tên danh mục"
                   {...register("name")}
                   disabled={loading}
                   className={errors.name ? "border-destructive focus-visible:ring-destructive" : ""}

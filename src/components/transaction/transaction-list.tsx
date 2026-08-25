@@ -242,9 +242,8 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
                     {/* Vế phải: Số tiền + Nút hành động */}
                     <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-border/30">
                       <span
-                        className={`text-base font-extrabold font-mono ${
-                          isIncome ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
-                        }`}
+                        className={`text-base font-extrabold font-mono ${isIncome ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                          }`}
                       >
                         {isIncome ? "+" : "-"}
                         {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(t.amount)}
@@ -282,13 +281,11 @@ export function TransactionList({ transactions, onEdit, onRefresh }: Transaction
       <ConfirmDialog
         isOpen={!!transactionToDelete}
         title="Xóa giao dịch này?"
-        description={`Bạn có chắc chắn muốn xóa giao dịch ${
-          transactionToDelete?.type === "INCOME" ? "Thu nhập" : "Chi tiêu"
-        } "${transactionToDelete?.category.name || ""}" (${
-          transactionToDelete
+        description={`Bạn có chắc chắn muốn xóa giao dịch ${transactionToDelete?.type === "INCOME" ? "Thu nhập" : "Chi tiêu"
+          } "${transactionToDelete?.category.name || ""}" (${transactionToDelete
             ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(transactionToDelete.amount)
             : ""
-        }) không? Số dư Ví chính sẽ được tự động hoàn trả.`}
+          }) không? Số dư Ví chính sẽ được tự động hoàn trả.`}
         confirmText="Xóa giao dịch"
         cancelText="Hủy"
         variant="destructive"
