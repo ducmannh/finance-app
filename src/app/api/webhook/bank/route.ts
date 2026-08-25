@@ -9,12 +9,38 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const secretQuery = url.searchParams.get("secret") || url.searchParams.get("token") || url.searchParams.get("key");
-    const authHeader = req.headers.get("authorization");
-    const bearerSecret = authHeader?.startsWith("Bearer ") ? authHeader.substring(7).trim() : null;
-    const xSecretKey = req.headers.get("x-secret-key") || req.headers.get("secure-token");
+    const secretQuery =
+      url.searchParams.get("secret") ||
+      url.searchParams.get("token") ||
+      url.searchParams.get("key") ||
+      url.searchParams.get("api_key");
 
-    const secret = secretQuery || bearerSecret || xSecretKey;
+    const authHeader = req.headers.get("authorization");
+    let authHeaderSecret: string | null = null;
+    if (authHeader) {
+      if (authHeader.startsWith("Bearer ")) {
+        authHeaderSecret = authHeader.substring(7).trim();
+      } else if (authHeader.startsWith("Apikey ")) {
+        authHeaderSecret = authHeader.substring(7).trim();
+      } else {
+        authHeaderSecret = authHeader.trim();
+      }
+    }
+
+    const xSecretKey =
+      req.headers.get("x-secret-key") ||
+      req.headers.get("x-api-key") ||
+      req.headers.get("secure-token") ||
+      req.headers.get("api-key");
+
+    // Đọc body payload
+    const body = await req.json().catch(() => null);
+    if (!body) {
+      return NextResponse.json({ success: false, error: "Payload JSON không hợp lệ." }, { status: 400 });
+    }
+
+    const secretBody = body.secret || body.apiKey || body.api_key;
+    const secret = secretQuery || authHeaderSecret || xSecretKey || secretBody;
 
     if (!secret) {
       return NextResponse.json(
@@ -34,12 +60,6 @@ export async function POST(req: NextRequest) {
         { success: false, error: "Mã Webhook Secret không hợp lệ hoặc không tồn tại." },
         { status: 401 }
       );
-    }
-
-    // Đọc body payload
-    const body = await req.json().catch(() => null);
-    if (!body) {
-      return NextResponse.json({ success: false, error: "Payload JSON không hợp lệ." }, { status: 400 });
     }
 
     // 1. Phân tích định dạng Casso
@@ -76,54 +96,92 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 2. Phân tích định dạng SePay hoặc Generic
+    // 2. Phân tích định dạng SePay hoặc Generic Webhook
     let amount = 0;
     let type: "INCOME" | "EXPENSE" = "EXPENSE";
-    let bankName = body.gateway || body.bankName || body.bank || "Ngân hàng";
-    let bankAccount = body.accountNumber || body.bankAccount || body.subAccount || null;
-    let content = body.content || body.description || body.message || body.body || "";
-    let transactionCode = body.referenceCode || body.code || body.id || `TX${Date.now().toString().slice(-6)}`;
+    const bankName = body.gateway || body.bankName || body.bank_name || body.bank || "Ngân hàng";
+    const bankAccount = body.accountNumber || body.account_number || body.bankAccount || body.subAccount || null;
+    const content = body.content || body.description || body.message || body.body || "";
+    const transactionCode =
+      body.referenceCode ||
+      body.reference_number ||
+      body.code ||
+      body.transaction_id ||
+      body.id ||
+      `TX${Date.now().toString().slice(-6)}`;
 
-    // Xử lý loại giao dịch SePay (transferType: "in" / "out")
-    if (body.transferType) {
-      if (body.transferType.toLowerCase() === "in") {
-        type = "INCOME";
-        amount = Number(body.transferAmount || body.amountIn || body.amount) || 0;
-      } else {
-        type = "EXPENSE";
-        amount = Number(body.transferAmount || body.amountOut || body.amount) || 0;
-      }
-    } else if (body.amountIn && Number(body.amountIn) > 0) {
+    // Hàm helper chuẩn hóa số tiền
+    const parseAmount = (val: any): number => {
+      if (val === undefined || val === null || val === "") return 0;
+      if (typeof val === "number") return Math.abs(val);
+      const str = String(val).trim().replace(/,/g, "");
+      const num = parseFloat(str);
+      return isNaN(num) ? 0 : Math.abs(num);
+    };
+
+    // Kiểm tra loại giao dịch từ SePay (transferType, transfer_type, transactionType, type...)
+    const rawTransferType = String(
+      body.transferType ||
+      body.transfer_type ||
+      body.transactionType ||
+      body.transaction_type ||
+      body.type ||
+      body.action ||
+      ""
+    ).toLowerCase().trim();
+
+    const rawAmountIn = parseAmount(body.amountIn || body.amount_in || body.inAmount);
+    const rawAmountOut = parseAmount(body.amountOut || body.amount_out || body.outAmount);
+    const rawTransferAmount = parseAmount(body.transferAmount || body.transfer_amount || body.amount);
+
+    if (rawTransferType === "in" || rawTransferType === "income" || rawTransferType === "receive" || rawTransferType === "credit" || rawTransferType === "+") {
       type = "INCOME";
-      amount = Number(body.amountIn);
-    } else if (body.amountOut && Number(body.amountOut) > 0) {
+      amount = rawTransferAmount || rawAmountIn;
+    } else if (rawTransferType === "out" || rawTransferType === "expense" || rawTransferType === "debit" || rawTransferType === "send" || rawTransferType === "-") {
       type = "EXPENSE";
-      amount = Number(body.amountOut);
-    } else if (body.type) {
-      const rawType = String(body.type).toUpperCase();
-      type = rawType === "INCOME" || rawType === "IN" || rawType === "+" ? "INCOME" : "EXPENSE";
-      amount = Math.abs(Number(body.amount) || 0);
+      amount = rawTransferAmount || rawAmountOut;
+    } else if (rawAmountOut > 0) {
+      type = "EXPENSE";
+      amount = rawAmountOut;
+    } else if (rawAmountIn > 0) {
+      type = "INCOME";
+      amount = rawAmountIn;
     } else if (body.amount !== undefined) {
-      const num = Number(body.amount);
+      const num = Number(String(body.amount).replace(/,/g, ""));
       if (num < 0) {
         type = "EXPENSE";
         amount = Math.abs(num);
       } else {
-        type = "INCOME";
         amount = num;
+        // Nếu nội dung chứa từ khóa trừ tiền / chuyển khoản đi
+        const lowerContent = content.toLowerCase();
+        if (
+          lowerContent.includes("chuyen tien") ||
+          lowerContent.includes("thanh toan") ||
+          lowerContent.includes("tru ") ||
+          lowerContent.includes("rut tien") ||
+          lowerContent.includes("-")
+        ) {
+          type = "EXPENSE";
+        } else {
+          type = "INCOME";
+        }
       }
+    } else if (rawTransferAmount > 0) {
+      amount = rawTransferAmount;
     }
 
     // Nếu không có số tiền trực tiếp, thử trích xuất từ nội dung thông báo (SMS / Push Notification text)
     if (amount <= 0 && content) {
       // Regex trích xuất số tiền từ text dạng: "TK ... -50,000VND" hoặc "+1,200,000 đ" hoặc "tang 50.000VND"
-      const match = content.match(/([+-]?\s*[\d\.,]+)\s*(?:VND|đ|d|dong)/i);
+      const match = content.match(/([+-]?\s*[\d\.,]+)\s*(?:VND|đ|d|dong|k)/i);
       if (match && match[1]) {
         const cleanNumber = match[1].replace(/[^\d]/g, "");
         amount = Number(cleanNumber) || 0;
-        if (content.includes("-") || content.toLowerCase().includes("giam") || content.toLowerCase().includes("tru")) {
+        const lower = content.toLowerCase();
+        if (content.includes("-") || lower.includes("giam") || lower.includes("tru") || lower.includes("chuyen")) {
           type = "EXPENSE";
-        } else if (content.includes("+") || content.toLowerCase().includes("tang") || content.toLowerCase().includes("cong")) {
+        } else if (content.includes("+") || lower.includes("tang") || lower.includes("cong") || lower.includes("nhan")) {
           type = "INCOME";
         }
       }

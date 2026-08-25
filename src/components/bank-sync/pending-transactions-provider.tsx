@@ -14,6 +14,7 @@ import {
   X,
   Sparkles,
   CheckCircle2,
+  BellRing,
 } from "lucide-react";
 
 interface PendingContextType {
@@ -27,13 +28,46 @@ interface PendingContextType {
 
 const PendingContext = createContext<PendingContextType | undefined>(undefined);
 
+// Hàm phát chuông thông báo nhẹ nhàng khi có biến động
+function playNotificationChime() {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(659.25, now); // Note E5
+    gain1.gain.setValueAtTime(0.12, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.3);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(987.77, now + 0.12); // Note B5
+    gain2.gain.setValueAtTime(0.15, now + 0.12);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.12);
+    osc2.stop(now + 0.5);
+  } catch {
+    // Bỏ qua lỗi audio autoplay nếu trình duyệt chặn
+  }
+}
+
 export function PendingTransactionsProvider({ children }: { children: React.ReactNode }) {
   const [pendingTransactions, setPendingTransactions] = useState<PendingTransactionData[]>([]);
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [categories, setCategories] = useState<CategoryData[]>([]);
 
-  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const [activeQuickProcessTx, setActiveQuickProcessTx] = useState<PendingTransactionData | null>(null);
   const [notificationQueue, setNotificationQueue] = useState<PendingTransactionData[]>([]);
 
@@ -62,12 +96,17 @@ export function PendingTransactionsProvider({ children }: { children: React.Reac
         setPendingTransactions(currentList);
         setPendingCount(res.pendingCount || currentList.length);
 
-        // Kiểm tra xem có giao dịch mới chưa từng xuất hiện không
-        if (initialFetchDoneRef.current) {
+        if (!initialFetchDoneRef.current) {
+          // Lần đầu tải: Nếu có sẵn giao dịch chờ duyệt, hiển thị thông báo nổi cho giao dịch mới nhất
+          if (currentList.length > 0) {
+            setNotificationQueue(currentList.slice(0, 2));
+          }
+        } else {
+          // Các lần polling tiếp theo: Kiểm tra xem có giao dịch mới chưa từng xuất hiện không
           const newItems = currentList.filter((item) => !knownTxIdsRef.current.has(item.id));
           if (newItems.length > 0) {
-            // Thêm vào hàng đợi thông báo
-            setNotificationQueue((prev) => [...prev, ...newItems]);
+            playNotificationChime();
+            setNotificationQueue((prev) => [...newItems, ...prev]);
           }
         }
 
@@ -86,10 +125,10 @@ export function PendingTransactionsProvider({ children }: { children: React.Reac
     loadCategories();
     refreshPending();
 
-    // Polling định kỳ mỗi 6 giây để bắt kịp biến động từ Webhook/Simulator
+    // Polling định kỳ mỗi 3 giây để bắt kịp biến động số dư tức thì từ SePay
     const interval = setInterval(() => {
       refreshPending();
-    }, 6000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [loadCategories, refreshPending]);
@@ -119,8 +158,8 @@ export function PendingTransactionsProvider({ children }: { children: React.Reac
     >
       {children}
 
-      {/* Floating Real-Time Notifications for Bank Transactions */}
-      <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+      {/* Floating Top Real-Time Notifications (Trượt từ trên xuống) */}
+      <div className="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 max-w-lg w-full px-3.5 pointer-events-none">
         {notificationQueue.map((tx) => {
           const isExpense = tx.type === "EXPENSE";
 
@@ -128,40 +167,42 @@ export function PendingTransactionsProvider({ children }: { children: React.Reac
             <div
               key={tx.id}
               onClick={() => handleNotificationClick(tx)}
-              className="pointer-events-auto group cursor-pointer relative overflow-hidden rounded-2xl border border-border/80 bg-background/95 p-4 shadow-2xl backdrop-blur-lg transition-all duration-300 hover:scale-[1.02] animate-in slide-in-from-right-8 fade-in-0"
+              className="pointer-events-auto group cursor-pointer relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-background/95 p-4 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-primary w-full animate-in slide-in-from-top-8 fade-in-0 duration-300 ring-4 ring-primary/10"
             >
-              {/* Top gradient highlight */}
+              {/* Highlight bar top */}
               <div
-                className={`absolute top-0 left-0 right-0 h-1 ${
+                className={`absolute top-0 left-0 right-0 h-1.5 ${
                   isExpense ? "bg-rose-500" : "bg-emerald-500"
                 }`}
               />
 
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3.5">
                   <div
-                    className={`p-2 rounded-xl shrink-0 ${
+                    className={`p-2.5 rounded-2xl shrink-0 ${
                       isExpense
                         ? "bg-rose-500/15 text-rose-600 dark:text-rose-400"
                         : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                     }`}
                   >
-                    {isExpense ? <ArrowUpRight className="h-5 w-5" /> : <ArrowDownLeft className="h-5 w-5" />}
+                    {isExpense ? <ArrowUpRight className="h-6 w-6" /> : <ArrowDownLeft className="h-6 w-6" />}
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold">
-                      <Landmark className="h-3.5 w-3.5" />
-                      <span>{tx.bankName || "Ngân hàng"}</span>
-                      <span>•</span>
-                      <span className="text-[11px] text-amber-600 dark:text-amber-400 font-bold flex items-center gap-0.5">
-                        <Sparkles className="h-3 w-3" /> Mới phát hiện
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                        <BellRing className="h-3 w-3 animate-bounce" /> Biến Động Mới
+                      </span>
+
+                      <span className="text-xs font-bold text-foreground flex items-center gap-1">
+                        <Landmark className="h-3.5 w-3.5 text-muted-foreground" />
+                        {tx.bankName || "Ngân hàng"}
                       </span>
                     </div>
 
-                    <div className="mt-1 flex items-baseline gap-1.5">
+                    <div className="flex items-baseline gap-2 pt-0.5">
                       <span
-                        className={`text-base font-extrabold tracking-tight ${
+                        className={`text-lg font-black tracking-tight ${
                           isExpense
                             ? "text-rose-600 dark:text-rose-400"
                             : "text-emerald-600 dark:text-emerald-400"
@@ -172,13 +213,13 @@ export function PendingTransactionsProvider({ children }: { children: React.Reac
                       </span>
                     </div>
 
-                    <p className="text-xs text-foreground/80 line-clamp-1 mt-0.5 font-medium">
+                    <p className="text-xs text-foreground/80 line-clamp-1 font-medium">
                       {tx.content || (isExpense ? "Chuyển tiền ngân hàng" : "Nhận tiền ngân hàng")}
                     </p>
 
-                    <div className="mt-2 flex items-center gap-1 text-[11px] font-bold text-primary group-hover:underline">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      <span>Nhấn vào đây để {isExpense ? "lưu hóa đơn" : "xác nhận thu nhập"}</span>
+                    <div className="pt-1 flex items-center gap-1 text-xs font-extrabold text-primary group-hover:underline">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Bấm vào đây để {isExpense ? "tạo hóa đơn" : "xác nhận thu nhập"} 1-chạm</span>
                     </div>
                   </div>
                 </div>
@@ -189,7 +230,7 @@ export function PendingTransactionsProvider({ children }: { children: React.Reac
                     e.stopPropagation();
                     dismissNotification(tx.id);
                   }}
-                  className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all shrink-0"
+                  className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all shrink-0"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -222,3 +263,4 @@ export function usePendingTransactions() {
   }
   return context;
 }
+
