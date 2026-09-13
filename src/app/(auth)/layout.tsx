@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Wallet, TrendingUp, ShieldCheck, PieChart, ArrowUpRight, Sparkles, CreditCard } from "lucide-react";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 export default function AuthLayout({
   children,
@@ -64,21 +65,7 @@ export default function AuthLayout({
       {/* Main Container */}
       <div className="relative z-10 flex w-full max-w-md flex-col items-center gap-6">
         {/* Brand Header */}
-        <Link href="/" className="group flex items-center gap-3 transition-transform hover:scale-105">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-tr from-emerald-500 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/20">
-            <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-slate-950">
-              <Wallet className="h-6 w-6 text-emerald-400 transition-transform group-hover:rotate-6" />
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-cyan-300 to-indigo-300">
-              MyFinance
-            </span>
-            <span className="text-xs font-medium text-slate-400 flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-emerald-400" /> Quản Lý Tài Chính Thông Minh
-            </span>
-          </div>
-        </Link>
+        <BrandLogo href="/" size="lg" className="mb-2" />
 
         {/* Auth Card Content */}
         <div className="w-full">

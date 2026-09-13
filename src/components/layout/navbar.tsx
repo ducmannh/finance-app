@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 interface NavbarProps {
   userName?: string;
@@ -60,14 +61,7 @@ export function Navbar({ userName }: NavbarProps) {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           {/* Brand logo */}
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="flex items-center gap-2 font-bold text-xl text-primary tracking-tight">
-              <div className="p-2 rounded-xl bg-primary text-primary-foreground shadow-xs">
-                <Wallet className="h-5 w-5" />
-              </div>
-              <span className="bg-linear-to-r from-primary to-emerald-500 bg-clip-text text-transparent font-extrabold">
-                MyFinance
-              </span>
-            </Link>
+            <BrandLogo href="/dashboard" size="md" />
 
             {/* Desktop Navigation Links */}
             <nav className="hidden md:flex items-center gap-1">

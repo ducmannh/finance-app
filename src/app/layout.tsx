@@ -11,8 +11,23 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "My Finance App",
-  description: "Personal and Business Finance Management",
+  title: {
+    default: "MyFinance - Quản Lý Chi Tiêu & Tài Chính Cá Nhân",
+    template: "%s | MyFinance",
+  },
+  description:
+    "Ứng dụng quản lý tài chính cá nhân thông minh, theo dõi thu chi, ngân sách, ví tiền và tự động đồng bộ biến động số dư ngân hàng qua SePay.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: [
+      { url: "/apple-icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+  },
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
